@@ -48,7 +48,7 @@ pontos_layer = pdk.Layer(
     get_fill_color='[255, 0, 0, 160]',
     pickable=False,
     radius_min_pixels=8,
-    radius_max_pixels=20
+    radius_max_pixels=12
 )
 
 # --- Gerar conexões entre localidades da mesma linha ---
