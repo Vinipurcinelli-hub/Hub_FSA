@@ -45,9 +45,10 @@ pontos_layer = pdk.Layer(
     "ScatterplotLayer",
     data=df_pontos[["lat", "lon"]],
     get_position='[lon, lat]',
-    get_radius=7000,
     get_fill_color='[255, 0, 0, 160]',
-    pickable=False
+    pickable=False,
+    radius_min_pixels=2,
+    radius_max_pixels=15
 )
 
 # --- Gerar conexões entre localidades da mesma linha ---
