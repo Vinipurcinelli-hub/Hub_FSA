@@ -75,6 +75,22 @@ linha_layer = pdk.Layer(
     get_width=3,
 )
 
+linha_horizontal = pdk.Layer(
+    "PathLayer",
+    data=pd.DataFrame({
+        "path": [[[ -180, -12.2292842525 ], [ 180, -12.2292842525 ]]]
+    }),
+    get_path="path",
+    get_color=[255, 255, 255],  # branco (pode trocar)
+    width_scale=1,
+    get_width=2,
+    width_min_pixels=1,
+    width_max_pixels=2,
+    opacity=0.6,
+    dash_size=4,  # define a largura do traço
+    gap_size=2,   # define o intervalo entre os traços
+)
+
 # --- View inicial centralizada ---
 view_state = pdk.ViewState(
     latitude=df["LAT"].mean(),
@@ -86,7 +102,7 @@ view_state = pdk.ViewState(
 st.pydeck_chart(pdk.Deck(
     map_style=None,
     initial_view_state=view_state,
-    layers=[pontos_layer, linha_layer]
+    layers=[pontos_layer, linha_layer, linha_horizontal]  # <-- adiciona aqui
 ))
 
 # --- Mostrar os dados ---
