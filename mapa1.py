@@ -3,9 +3,8 @@ import pandas as pd
 import pydeck as pdk
 
 # --- Configuração da Página ---
-st.set_page_config(layout="wide", page_title="Mapa das Localidades")
-st.title("🗺️ Mapa das Duas Linhas Operacionais")
-st.markdown("Conexão entre localidades de cada linha com base na sequência da malha.")
+st.set_page_config(layout="wide", page_title="Mapa do projeto")
+st.title("🗺️ Projeto Operação integrada - Nova Itapemirim & Guanabara")
 
 # --- Função para carregar os dados ---
 @st.cache_data
@@ -87,7 +86,7 @@ linha_horizontal = pdk.Layer(
     width_min_pixels=1,
     width_max_pixels=2,
     opacity=0.6,
-    dash_size=4,  # define a largura do traço
+    dash_size=6,  # define a largura do traço
     gap_size=2,   # define o intervalo entre os traços
 )
 
