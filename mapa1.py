@@ -82,11 +82,11 @@ linha_horizontal = pdk.Layer(
     get_path="path",
     get_color=[255, 255, 255],  # branco (pode trocar)
     width_scale=1,
-    get_width=2,
+    get_width=10,
     width_min_pixels=1,
     width_max_pixels=2,
     opacity=0.6,
-    dash_size=1,  # define a largura do traço
+    dash_size=4,  # define a largura do traço
     gap_size=2,   # define o intervalo entre os traços
 )
 
