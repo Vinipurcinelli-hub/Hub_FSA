@@ -80,14 +80,14 @@ linha_horizontal = pdk.Layer(
         "path": [[[ -180, -12.2292842525 ], [ 180, -12.2292842525 ]]]
     }),
     get_path="path",
-    get_color=[255, 255, 255],  # branco (pode trocar)
+    get_color=[255, 255, 255],
+    get_width=20,         # <--- aumente aqui para engrossar
     width_scale=1,
-    get_width=10,
-    width_min_pixels=1,
-    width_max_pixels=2,
+    width_min_pixels=2,
+    width_max_pixels=10,
     opacity=0.6,
-    dash_size=4,  # define a largura do traço
-    gap_size=2,   # define o intervalo entre os traços
+    dash_size=4,
+    gap_size=2,
 )
 
 # --- View inicial centralizada ---
