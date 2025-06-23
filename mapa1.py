@@ -81,7 +81,9 @@ linha_horizontal = pdk.Layer(
         "path": [[[ -180, -12.2292842525 ], [ 180, -12.2292842525 ]]]
     }),
     get_path="path",
-    get_color=[255, 255, 255],
+    # A cor branca não fica visível com o tema claro do Streamlit.
+    # Usamos preto para destacar a linha horizontal no modo Light.
+    get_color=[0, 0, 0],
     get_width=20,         # <--- aumente aqui para engrossar
     width_scale=1,
     width_min_pixels=2,
@@ -89,6 +91,43 @@ linha_horizontal = pdk.Layer(
     opacity=0.6,
     dash_size=4,
     gap_size=2,
+)
+
+# --- Destaque do HUB SALA VIP ---
+HUB_LAT = -12.6421724
+HUB_LON = -38.0897993
+OFFSET = 0.05  # tamanho do retângulo em graus
+
+retangulo_data = pd.DataFrame({
+    "coordinates": [[
+        [HUB_LON - OFFSET, HUB_LAT - OFFSET],
+        [HUB_LON - OFFSET, HUB_LAT + OFFSET],
+        [HUB_LON + OFFSET, HUB_LAT + OFFSET],
+        [HUB_LON + OFFSET, HUB_LAT - OFFSET],
+    ]]
+})
+
+retangulo_layer = pdk.Layer(
+    "PolygonLayer",
+    data=retangulo_data,
+    get_polygon="coordinates",
+    get_fill_color=[255, 255, 255, 0],  # sem preenchimento
+    get_line_color=[0, 0, 0],
+    get_line_width=4,
+)
+
+titulo_layer = pdk.Layer(
+    "TextLayer",
+    data=pd.DataFrame({
+        "coordinates": [[HUB_LON, HUB_LAT]],
+        "text": ["HUB SALA VIP\nFEIRA DE SANTANA"],
+    }),
+    get_position="coordinates",
+    get_text="text",
+    get_color=[0, 0, 0],
+    get_size=24,
+    get_text_anchor="'middle'",
+    get_alignment_baseline="'top'",
 )
 
 # --- View inicial centralizada ---
@@ -102,7 +141,13 @@ view_state = pdk.ViewState(
 st.pydeck_chart(pdk.Deck(
     map_style=None,
     initial_view_state=view_state,
-    layers=[pontos_layer, linha_layer, linha_horizontal]  # <-- adiciona aqui
+    layers=[
+        pontos_layer,
+        linha_layer,
+        linha_horizontal,
+        retangulo_layer,
+        titulo_layer,
+    ]
 ))
 
 # --- Mostrar os dados ---
