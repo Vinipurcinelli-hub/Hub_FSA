@@ -101,15 +101,19 @@ view_state = pdk.ViewState(
 )
 
 # --- Mostrar o mapa ---
-st.pydeck_chart(pdk.Deck(
-    map_style=None,
-    initial_view_state=view_state,
-    layers=[
-        pontos_layer,
-        linha_layer,
-        linha_horizontal
-    ]
-))
+st.pydeck_chart(
+    pdk.Deck(
+        map_style=None,
+        initial_view_state=view_state,
+        layers=[
+            pontos_layer,
+            linha_layer,
+            linha_horizontal
+        ]
+    ),
+    use_container_width=True,
+    height=800,
+)
 
 # --- Mostrar os dados ---
 with st.expander("🔍 Ver dados utilizados"):
