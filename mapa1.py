@@ -45,7 +45,7 @@ pontos_layer = pdk.Layer(
     "ScatterplotLayer",
     data=df_pontos[["lat", "lon"]],
     get_position='[lon, lat]',
-    get_fill_color='[0, 0, 0, 0]',
+    get_fill_color='[0, 0, 0, 160]',
     pickable=False,
     radius_min_pixels=4,
     radius_max_pixels=30
