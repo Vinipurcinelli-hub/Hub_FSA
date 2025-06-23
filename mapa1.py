@@ -94,8 +94,8 @@ linha_horizontal = pdk.Layer(
 )
 
 # --- Destaque do HUB SALA VIP ---
-HUB_LAT = -12.6421724
-HUB_LON = -38.0897993
+HUB_LAT = -13.4884524
+HUB_LON = -39.1411053
 OFFSET = 0.05  # tamanho do retângulo em graus
 
 retangulo_data = pd.DataFrame({
