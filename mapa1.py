@@ -124,7 +124,7 @@ with col_tabela_itap:
         else df["NOME DA LINHA"]
     )
     linhas_itap_df = pd.DataFrame(sorted(linhas_itap.unique()), columns=["LINHA"])
-    st.dataframe(linhas_itap_df, hide_index=True)
+    st.dataframe(linhas_itap_df, hide_index=True, height=800)
 
 # --- Mostrar os dados ---
 with st.expander("🔍 Ver dados utilizados"):
@@ -262,7 +262,7 @@ with col_tabela_gua:
         sorted(df_gua_filtrado["DESCRICAO DA LINHA"].unique()),
         columns=["LINHA"]
     )
-    st.dataframe(linhas_gua_df, hide_index=True)
+    st.dataframe(linhas_gua_df, hide_index=True, height=800)
 
 # --- Mostrar os dados da Guanabara ---
 with st.expander("🔍 Ver dados utilizados - Guanabara"):
