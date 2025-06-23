@@ -71,7 +71,7 @@ linha_layer = pdk.Layer(
     data=pd.DataFrame(conexoes),
     get_source_position="source",
     get_target_position="target",
-    get_color=[0, 100, 200],
+    get_color=[254, 221, 49],
     get_width=3,
 )
 
