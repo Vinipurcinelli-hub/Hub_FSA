@@ -81,7 +81,9 @@ linha_horizontal = pdk.Layer(
         "path": [[[ -180, -12.2292842525 ], [ 180, -12.2292842525 ]]]
     }),
     get_path="path",
-    get_color=[255, 255, 255],
+    # A cor branca não fica visível com o tema claro do Streamlit.
+    # Usamos preto para destacar a linha horizontal no modo Light.
+    get_color=[0, 0, 0],
     get_width=20,         # <--- aumente aqui para engrossar
     width_scale=1,
     width_min_pixels=2,
