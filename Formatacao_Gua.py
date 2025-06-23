@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 # Arquivos de entrada
 arquivo_rotas = "QT Guanabara - Maio de 2025.xlsx"
@@ -9,42 +10,54 @@ rotas = pd.read_excel(arquivo_rotas)
 coordenadas = pd.read_excel(arquivo_coordenadas)
 
 # Normaliza texto para facilitar comparacoes
-rotas['ORIGEM'] = rotas['ORIGEM'].str.strip()
-rotas['DESTINO'] = rotas['DESTINO'].str.strip()
-rotas['SECOES DA LINHA'] = rotas['SECOES DA LINHA'].str.strip()
-coordenadas['CIDADE (UF)'] = coordenadas['CIDADE (UF)'].str.strip()
+def format_city(cidade: str) -> str:
+    """Normaliza a cidade colocando espaco antes do parenteses."""
+    if pd.isna(cidade):
+        return cidade
+    cidade = cidade.strip()
+    return re.sub(r"\s*\((\w{2})\)", r" (\1)", cidade)
+
+rotas['ORIGEM'] = rotas['ORIGEM'].apply(format_city)
+rotas['DESTINO'] = rotas['DESTINO'].apply(format_city)
+rotas['DESCRICAO DA LINHA'] = rotas['DESCRICAO DA LINHA'].apply(
+    lambda x: ' - '.join(format_city(p) for p in x.split(' - '))
+)
+coordenadas['CIDADE (UF)'] = coordenadas['CIDADE (UF)'].apply(format_city)
 
 resultado = []
 
 # Agrupa pelas chaves solicitadas
 for (prefixo, desc), grupo in rotas.groupby(['PREFIXO', 'DESCRICAO DA LINHA']):
-    partes_desc = [p.strip() for p in desc.split(' - ')[:2]]
-    origem_desc, destino_desc = partes_desc[0], partes_desc[1]
+    desc_formatado = format_city(desc)
+    partes_desc = [p.strip() for p in desc_formatado.split(' - ')[:2]]
+    if len(partes_desc) < 2:
+        continue
+    origem_desc, destino_desc = partes_desc
 
-    # Extrai cada origem em ordem de aparicao na coluna "SECOES DA LINHA"
-    cidades_seq = (
-        grupo['SECOES DA LINHA']
-        .str.extract(r'^(.*?) -')[0]
-        .drop_duplicates()
-        .tolist()
-    )
+    # Mantem a ordem das cidades conforme aparecem
+    grupo = grupo.sort_index()
+    cidades_seq = []
+    visitados = set()
 
-    # Garante que a cidade final apareca na sequencia
-    if destino_desc not in cidades_seq:
+    if origem_desc not in visitados:
+        cidades_seq.append(origem_desc)
+        visitados.add(origem_desc)
+
+    for idx, row in grupo.iterrows():
+        cidade_origem = row['ORIGEM']
+        if cidade_origem not in visitados:
+            cidades_seq.append(cidade_origem)
+            visitados.add(cidade_origem)
+        cidade_dest = row['DESTINO']
+        if not (idx == grupo.index.min() and cidade_dest == destino_desc and cidade_origem == origem_desc):
+            if cidade_dest not in visitados:
+                cidades_seq.append(cidade_dest)
+                visitados.add(cidade_dest)
+
+    if destino_desc not in visitados:
         cidades_seq.append(destino_desc)
 
-    primeira_cidade = cidades_seq[0]
-    ultima_cidade = cidades_seq[-1]
-
-    # Determina o sentido
-    if primeira_cidade == origem_desc:
-        sentido = "IDA"
-    elif primeira_cidade == destino_desc:
-        sentido = "VOLTA"
-    elif ultima_cidade == destino_desc:
-        sentido = "IDA"
-    else:
-        sentido = "IDA"
+    sentido = "IDA" if cidades_seq[0] == origem_desc else "VOLTA"
 
     # Cria linhas para cada cidade da sequencia
     for sequencia, cidade in enumerate(cidades_seq, start=1):
@@ -53,7 +66,7 @@ for (prefixo, desc), grupo in rotas.groupby(['PREFIXO', 'DESCRICAO DA LINHA']):
         lon = coord['LON'].iloc[0] if not coord.empty else None
         resultado.append({
             'PREFIXO': prefixo,
-            'DESCRICAO DA LINHA': desc,
+            'DESCRICAO DA LINHA': desc_formatado,
             'CIDADES': cidade,
             'LAT': lat,
             'LON': lon,
