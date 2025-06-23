@@ -184,13 +184,14 @@ grupos_gua = df_gua_filtrado.groupby(["PREFIXO", "DESCRICAO DA LINHA"])
 
 for _, grupo in grupos_gua:
     grupo_ordenado = grupo.sort_values(by="SEQUENCIA")
-    for i in range(len(grupo_ordenado) - 1):
-        origem = grupo_ordenado.iloc[i]
-        destino = grupo_ordenado.iloc[i + 1]
-        conexoes_gua.append({
-            "source": [float(origem["LON"]), float(origem["LAT"])],
-            "target": [float(destino["LON"]), float(destino["LAT"])]
-        })
+    grupo_ordenado["NEXT_LAT"] = grupo_ordenado["LAT"].shift(-1)
+    grupo_ordenado["NEXT_LON"] = grupo_ordenado["LON"].shift(-1)
+    for _, row in grupo_ordenado[:-1].iterrows():
+        if pd.notna(row["NEXT_LAT"]) and pd.notna(row["NEXT_LON"]):
+            conexoes_gua.append({
+                "source": [float(row["LON"]), float(row["LAT"])],
+                "target": [float(row["NEXT_LON"]), float(row["NEXT_LAT"])]
+            })
 
 # --- Criar camada de linhas de conexão ---
 linha_gua_layer = pdk.Layer(
