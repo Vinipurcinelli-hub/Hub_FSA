@@ -93,43 +93,6 @@ linha_horizontal = pdk.Layer(
     gap_size=2,
 )
 
-# --- Destaque do HUB SALA VIP ---
-HUB_LAT = -11.6880417
-HUB_LON = -36.7387369
-OFFSET = 0.05  # tamanho do retângulo em graus
-
-retangulo_data = pd.DataFrame({
-    "coordinates": [[
-        [HUB_LON - OFFSET, HUB_LAT - OFFSET],
-        [HUB_LON - OFFSET, HUB_LAT + OFFSET],
-        [HUB_LON + OFFSET, HUB_LAT + OFFSET],
-        [HUB_LON + OFFSET, HUB_LAT - OFFSET],
-    ]]
-})
-
-retangulo_layer = pdk.Layer(
-    "PolygonLayer",
-    data=retangulo_data,
-    get_polygon="coordinates",
-    get_fill_color=[255, 255, 255, 0],  # sem preenchimento
-    get_line_color=[0, 0, 0],
-    get_line_width=4,
-)
-
-titulo_layer = pdk.Layer(
-    "TextLayer",
-    data=pd.DataFrame({
-        "coordinates": [[HUB_LON, HUB_LAT]],
-        "text": ["HUB SALA VIP\nFEIRA DE SANTANA"],
-    }),
-    get_position="coordinates",
-    get_text="text",
-    get_color=[0, 0, 0],
-    get_size=24,
-    get_text_anchor="'middle'",
-    get_alignment_baseline="'top'",
-)
-
 # --- View inicial centralizada ---
 view_state = pdk.ViewState(
     latitude=df["LAT"].mean(),
@@ -144,9 +107,7 @@ st.pydeck_chart(pdk.Deck(
     layers=[
         pontos_layer,
         linha_layer,
-        linha_horizontal,
-        retangulo_layer,
-        titulo_layer,
+        linha_horizontal
     ]
 ))
 
