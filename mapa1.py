@@ -143,7 +143,7 @@ if df_gua.empty:
 df_gua = df_gua.sort_values(by=["PREFIXO", "DESCRICAO DA LINHA", "SEQUENCIA"])
 
 # --- Filtro de linhas ---
-linhas_unicas = sorted(df_gua["PREFIXO","DESCRICAO DA LINHA"].unique())
+linhas_unicas = sorted(df_gua["DESCRICAO DA LINHA"].unique())
 selecionadas = st.multiselect(
     "Selecione as linhas da Guanabara",
     options=linhas_unicas,
@@ -154,7 +154,7 @@ if not selecionadas:
     st.warning("Selecione ao menos uma linha para visualizar as conexões da Guanabara.")
     st.stop()
 
-df_gua_filtrado = df_gua[df_gua["PREFIXO","DESCRICAO DA LINHA"].isin(selecionadas)]
+df_gua_filtrado = df_gua[df_gua["DESCRICAO DA LINHA"].isin(selecionadas)]
 
 # --- Criar DataFrame seguro apenas com coordenadas ---
 df_gua_pontos = df_gua_filtrado[["LAT", "LON"]].copy()
