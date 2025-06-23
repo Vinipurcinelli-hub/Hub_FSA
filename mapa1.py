@@ -180,7 +180,7 @@ pontos_gua_layer = pdk.Layer(
 
 # --- Gerar conexões entre localidades da mesma linha ---
 conexoes_gua = []
-grupos_gua = df_gua_filtrado.groupby(["PREFIXO", "DESCRICAO DA LINHA", "SENTIDO"])
+grupos_gua = df_gua_filtrado.groupby(["PREFIXO", "DESCRICAO DA LINHA"])
 
 for _, grupo in grupos_gua:
     grupo_ordenado = grupo.sort_values(by="SEQUENCIA")
