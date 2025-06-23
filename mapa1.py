@@ -142,8 +142,22 @@ if df_gua.empty:
 # --- Ordenar os dados pela sequência das cidades dentro de cada linha ---
 df_gua = df_gua.sort_values(by=["PREFIXO", "DESCRICAO DA LINHA", "SEQUENCIA"])
 
+# --- Filtro de linhas ---
+linhas_unicas = sorted(df_gua["DESCRICAO DA LINHA"].unique())
+selecionadas = st.multiselect(
+    "Selecione as linhas da Guanabara",
+    options=linhas_unicas,
+    default=linhas_unicas,
+)
+
+if not selecionadas:
+    st.warning("Selecione ao menos uma linha para visualizar as conexões da Guanabara.")
+    st.stop()
+
+df_gua_filtrado = df_gua[df_gua["DESCRICAO DA LINHA"].isin(selecionadas)]
+
 # --- Criar DataFrame seguro apenas com coordenadas ---
-df_gua_pontos = df_gua[["LAT", "LON"]].copy()
+df_gua_pontos = df_gua_filtrado[["LAT", "LON"]].copy()
 df_gua_pontos = df_gua_pontos.dropna()
 df_gua_pontos["lat"] = df_gua_pontos["LAT"].astype(float)
 df_gua_pontos["lon"] = df_gua_pontos["LON"].astype(float)
@@ -166,7 +180,7 @@ pontos_gua_layer = pdk.Layer(
 
 # --- Gerar conexões entre localidades da mesma linha ---
 conexoes_gua = []
-grupos_gua = df_gua.groupby(["PREFIXO", "DESCRICAO DA LINHA", "SENTIDO"])
+grupos_gua = df_gua_filtrado.groupby(["PREFIXO", "DESCRICAO DA LINHA", "SENTIDO"])
 
 for _, grupo in grupos_gua:
     grupo_ordenado = grupo.sort_values(by="SEQUENCIA")
@@ -206,8 +220,8 @@ linha_horizontal_gua = pdk.Layer(
 
 # --- View inicial centralizada ---
 view_state_gua = pdk.ViewState(
-    latitude=df_gua["LAT"].mean(),
-    longitude=df_gua["LON"].mean(),
+    latitude=df_gua_filtrado["LAT"].mean(),
+    longitude=df_gua_filtrado["LON"].mean(),
     zoom=5,
 )
 
@@ -228,4 +242,4 @@ st.pydeck_chart(
 
 # --- Mostrar os dados da Guanabara ---
 with st.expander("🔍 Ver dados utilizados - Guanabara"):
-    st.dataframe(df_gua)
+    st.dataframe(df_gua_filtrado)
