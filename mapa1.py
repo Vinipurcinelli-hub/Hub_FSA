@@ -118,3 +118,128 @@ st.pydeck_chart(
 # --- Mostrar os dados ---
 with st.expander("🔍 Ver dados utilizados"):
     st.dataframe(df)
+
+# --- Carregar dados da Guanabara ---
+@st.cache_data
+def carregar_dados_gua():
+    try:
+        df_g = pd.read_excel("Linhas_selecionadas_Gua.xlsx")
+        df_g = df_g.dropna(subset=["LAT", "LON", "SEQUENCIA"])
+        df_g["SEQUENCIA"] = pd.to_numeric(df_g["SEQUENCIA"], errors="coerce")
+        df_g["LAT"] = df_g["LAT"].astype(float)
+        df_g["LON"] = df_g["LON"].astype(float)
+        return df_g
+    except Exception as e:
+        st.error(f"Erro ao carregar arquivo da Guanabara: {e}")
+        return pd.DataFrame()
+
+df_gua = carregar_dados_gua()
+
+if df_gua.empty:
+    st.warning("Nenhum dado válido para exibir para a Guanabara.")
+    st.stop()
+
+# --- Ordenar os dados pela sequência das cidades dentro de cada linha ---
+df_gua = df_gua.sort_values(by=["PREFIXO", "DESCRICAO DA LINHA", "SEQUENCIA"])
+
+# --- Filtro de linhas ---
+linhas_unicas = sorted(df_gua["DESCRICAO DA LINHA"].unique())
+selecionadas = st.multiselect(
+    "Selecione as linhas da Guanabara",
+    options=linhas_unicas,
+    default=linhas_unicas,
+)
+
+if not selecionadas:
+    st.warning("Selecione ao menos uma linha para visualizar as conexões da Guanabara.")
+    st.stop()
+
+df_gua_filtrado = df_gua[df_gua["DESCRICAO DA LINHA"].isin(selecionadas)]
+
+# --- Criar DataFrame seguro apenas com coordenadas ---
+df_gua_pontos = df_gua_filtrado[["LAT", "LON"]].copy()
+df_gua_pontos = df_gua_pontos.dropna()
+df_gua_pontos["lat"] = df_gua_pontos["LAT"].astype(float)
+df_gua_pontos["lon"] = df_gua_pontos["LON"].astype(float)
+
+# --- Verificar se há valores inválidos ---
+if df_gua_pontos["lat"].isnull().any() or df_gua_pontos["lon"].isnull().any():
+    st.error("Erro: coordenadas inválidas nos pontos da Guanabara.")
+    st.stop()
+
+# --- Criar camada de pontos pretos ---
+pontos_gua_layer = pdk.Layer(
+    "ScatterplotLayer",
+    data=df_gua_pontos[["lat", "lon"]],
+    get_position='[lon, lat]',
+    get_fill_color='[0, 0, 0, 160]',
+    pickable=False,
+    radius_min_pixels=4,
+    radius_max_pixels=30
+)
+
+# --- Gerar conexões entre localidades da mesma linha ---
+conexoes_gua = []
+grupos_gua = df_gua_filtrado.groupby(["PREFIXO", "DESCRICAO DA LINHA", "SENTIDO"])
+
+for _, grupo in grupos_gua:
+    grupo_ordenado = grupo.sort_values(by="SEQUENCIA")
+    for i in range(len(grupo_ordenado) - 1):
+        origem = grupo_ordenado.iloc[i]
+        destino = grupo_ordenado.iloc[i + 1]
+        conexoes_gua.append({
+            "source": [float(origem["LON"]), float(origem["LAT"])],
+            "target": [float(destino["LON"]), float(destino["LAT"])]
+        })
+
+# --- Criar camada de linhas de conexão ---
+linha_gua_layer = pdk.Layer(
+    "LineLayer",
+    data=pd.DataFrame(conexoes_gua),
+    get_source_position="source",
+    get_target_position="target",
+    get_color=[0, 0, 139],
+    get_width=3,
+)
+
+linha_horizontal_gua = pdk.Layer(
+    "PathLayer",
+    data=pd.DataFrame({
+        "path": [[[-180, -12.2292842525], [180, -12.2292842525]]]
+    }),
+    get_path="path",
+    get_color=[0, 0, 0],
+    get_width=20,
+    width_scale=1,
+    width_min_pixels=2,
+    width_max_pixels=10,
+    opacity=0.6,
+    dash_size=4,
+    gap_size=2,
+)
+
+# --- View inicial centralizada ---
+view_state_gua = pdk.ViewState(
+    latitude=df_gua_filtrado["LAT"].mean(),
+    longitude=df_gua_filtrado["LON"].mean(),
+    zoom=5,
+)
+
+# --- Mostrar o mapa da Guanabara ---
+st.pydeck_chart(
+    pdk.Deck(
+        map_style=None,
+        initial_view_state=view_state_gua,
+        layers=[
+            pontos_gua_layer,
+            linha_gua_layer,
+            linha_horizontal_gua
+        ]
+    ),
+    use_container_width=True,
+    height=800,
+)
+
+# --- Mostrar os dados da Guanabara ---
+with st.expander("🔍 Ver dados utilizados - Guanabara"):
+    st.dataframe(df_gua_filtrado)
