@@ -51,11 +51,11 @@ def gerar_tabela_horarios():
         resultado.columns = ["Faixa de horário", "Quantidade de incidências semanais"]
 
         # Adiciona linha de totais
-        total = resultado["Quantidade de incidências"].sum()
+        total = resultado["Quantidade de incidências semanais"].sum()
         total_row = pd.DataFrame(
             {
                 "Faixa de horário": ["Total"],
-                "Quantidade de incidências": [total],
+                "Quantidade de incidências semanais": [total],
             }
         )
         resultado = pd.concat([resultado, total_row], ignore_index=True)
