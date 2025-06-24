@@ -100,21 +100,6 @@ view_state = pdk.ViewState(
     zoom=5,
 )
 
-# --- Mostrar o mapa ---
-st.pydeck_chart(
-    pdk.Deck(
-        map_style=None,
-        initial_view_state=view_state,
-        layers=[
-            pontos_layer,
-            linha_layer,
-            linha_horizontal
-        ]
-    ),
-    use_container_width=True,
-    height=800,
-)
-
 # --- Mostrar mapa e lista de linhas da Itapemirim lado a lado ---
 col_mapa_itap, col_tabela_itap = st.columns([3, 1])
 
@@ -142,8 +127,6 @@ with col_tabela_itap:
     st.dataframe(linhas_itap_df, hide_index=True, height=800)
 
 # --- Mostrar os dados ---
-with st.expander("🔍 Ver dados utilizados"):
-    st.dataframe(df)
 with st.expander("🔍 Ver dados utilizados"):
     st.dataframe(df)
 
