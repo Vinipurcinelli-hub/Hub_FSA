@@ -20,6 +20,40 @@ def carregar_dados():
         st.error(f"Erro ao carregar arquivo: {e}")
         return pd.DataFrame()
 
+@st.cache_data
+def gerar_tabela_horarios():
+    """Gera contagem de partidas de Feira de Santana por faixa horária."""
+    try:
+        df_malha = pd.read_csv("Malha_Formatada.csv", sep=";", encoding="utf-8-sig")
+        feira = df_malha[df_malha["LOCALIDADE"].str.upper().str.contains("FEIRA DE SANTANA")].copy()
+        feira["HORARIO"] = pd.to_datetime(feira["HORARIO"], format="%H:%M", errors="coerce")
+
+        time_bins = [0, 4, 8, 12, 16, 20, 24]
+        faixas = [
+            "00:00-03:59",
+            "04:00-07:59",
+            "08:00-11:59",
+            "12:00-15:59",
+            "16:00-19:59",
+            "20:00-23:59",
+        ]
+
+        feira["Faixa"] = pd.cut(
+            feira["HORARIO"].dt.hour,
+            bins=time_bins,
+            labels=faixas,
+            right=False,
+            include_lowest=True,
+        )
+
+        contagem = feira["Faixa"].value_counts().sort_index()
+        resultado = contagem.reset_index()
+        resultado.columns = ["Faixa de horário", "Quantidade de incidências"]
+        return resultado
+    except Exception as e:
+        st.error(f"Erro ao gerar tabela de horários: {e}")
+        return pd.DataFrame()
+
 df = carregar_dados()
 
 if df.empty:
@@ -125,6 +159,11 @@ with col_tabela_itap:
     )
     linhas_itap_df = pd.DataFrame(sorted(linhas_itap.unique()), columns=["LINHA"])
     st.dataframe(linhas_itap_df, hide_index=True, height=800)
+
+# --- Tabela de horários de Feira de Santana ---
+horarios_df = gerar_tabela_horarios()
+if not horarios_df.empty:
+    st.dataframe(horarios_df, hide_index=True)
 
 # --- Mostrar os dados ---
 with st.expander("🔍 Ver dados utilizados"):
