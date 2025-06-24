@@ -29,8 +29,49 @@ if df.empty:
 # --- Ordenar os dados pela sequência das cidades dentro de cada linha ---
 df = df.sort_values(by=["PREFIXO SIGMA", "NOME DA LINHA", "SERVICO", "TIPO_VEICULO", "FREQUENCIA", "SEQUENCIA"])
 
+# --- Coluna com prefixo concatenado ao nome da linha ---
+df["LINHA_COMPLETA"] = df["PREFIXO SIGMA"].astype(str) + " - " + df["NOME DA LINHA"]
+
+linhas_itap_lista = sorted(df["LINHA_COMPLETA"].unique())
+
+# --- Controle de seleção das linhas ---
+select_all_itap = st.checkbox(
+    "Selecionar ou desmarcar todas as linhas da Itapemirim",
+    value=True,
+    key="itap_all",
+)
+
+if "itap_table" not in st.session_state:
+    st.session_state["itap_table"] = pd.DataFrame(
+        {"Linha": linhas_itap_lista, "Selecionar": [True] * len(linhas_itap_lista)}
+    )
+
+# Atualiza todas as marcas quando o checkbox principal muda
+if st.session_state.get("last_itap_all") != select_all_itap:
+    st.session_state["itap_table"]["Selecionar"] = select_all_itap
+st.session_state["last_itap_all"] = select_all_itap
+
+# --- Mostrar mapa e lista de linhas da Itapemirim lado a lado ---
+col_mapa_itap, col_tabela_itap = st.columns([3, 1])
+
+with col_tabela_itap:
+    itap_table_display = st.data_editor(
+        st.session_state["itap_table"],
+        hide_index=True,
+        column_config={"Selecionar": st.column_config.CheckboxColumn("Selecionar")},
+        key="editor_itap",
+        height=800,
+        use_container_width=True,
+    )
+    st.session_state["itap_table"] = itap_table_display
+    linhas_itap_selecionadas = itap_table_display[
+        itap_table_display["Selecionar"]
+    ]["Linha"].tolist()
+
+df_filtrado_itap = df[df["LINHA_COMPLETA"].isin(linhas_itap_selecionadas)]
+
 # --- Criar DataFrame seguro apenas com coordenadas ---
-df_pontos = df[["LAT", "LON"]].copy()
+df_pontos = df_filtrado_itap[["LAT", "LON"]].copy()
 df_pontos = df_pontos.dropna()
 df_pontos["lat"] = df_pontos["LAT"].astype(float)
 df_pontos["lon"] = df_pontos["LON"].astype(float)
@@ -53,7 +94,7 @@ pontos_layer = pdk.Layer(
 
 # --- Gerar conexões entre localidades da mesma linha ---
 conexoes = []
-grupos = df.groupby(['PREFIXO SIGMA', 'NOME DA LINHA', 'SERVICO', 'TIPO_VEICULO', 'FREQUENCIA'])
+grupos = df_filtrado_itap.groupby(['PREFIXO SIGMA', 'NOME DA LINHA', 'SERVICO', 'TIPO_VEICULO', 'FREQUENCIA'])
 
 for chave, grupo in grupos:
     grupo_ordenado = grupo.sort_values(by="SEQUENCIA")
@@ -95,13 +136,10 @@ linha_horizontal = pdk.Layer(
 
 # --- View inicial centralizada ---
 view_state = pdk.ViewState(
-    latitude=df["LAT"].mean(),
-    longitude=df["LON"].mean(),
+    latitude=df_filtrado_itap["LAT"].mean(),
+    longitude=df_filtrado_itap["LON"].mean(),
     zoom=5,
 )
-
-# --- Mostrar mapa e lista de linhas da Itapemirim lado a lado ---
-col_mapa_itap, col_tabela_itap = st.columns([3, 1])
 
 with col_mapa_itap:
     st.pydeck_chart(
@@ -117,14 +155,6 @@ with col_mapa_itap:
         use_container_width=True,
         height=800,
     )
-
-with col_tabela_itap:
-    linhas_itap = (
-        df["DESCRICAO DA LINHA"] if "DESCRICAO DA LINHA" in df.columns
-        else df["NOME DA LINHA"]
-    )
-    linhas_itap_df = pd.DataFrame(sorted(linhas_itap.unique()), columns=["LINHA"])
-    st.dataframe(linhas_itap_df, hide_index=True, height=800)
 
 # --- Mostrar os dados ---
 with st.expander("🔍 Ver dados utilizados"):
@@ -153,21 +183,44 @@ if df_gua.empty:
 # --- Ordenar os dados pela sequência das cidades dentro de cada linha ---
 df_gua = df_gua.sort_values(by=["PREFIXO", "DESCRICAO DA LINHA", "SEQUENCIA"])
 
-# --- Filtro de linhas ---
-linhas_unicas = sorted(df_gua["DESCRICAO DA LINHA"].unique())
-selecionadas = st.multiselect(
-    "Selecione as linhas da Guanabara",
-    options=linhas_unicas,
-    default=linhas_unicas,
+# --- Coluna com prefixo concatenado ao nome da linha ---
+df_gua["LINHA_COMPLETA"] = df_gua["PREFIXO"].astype(str) + " - " + df_gua["DESCRICAO DA LINHA"]
+
+# --- Seleção de linhas ---
+linhas_gua_lista = sorted(df_gua["LINHA_COMPLETA"].unique())
+
+select_all_gua = st.checkbox(
+    "Selecionar ou desmarcar todas as linhas da Guanabara",
+    value=True,
+    key="gua_all",
 )
 
-if not selecionadas:
-    st.warning("Selecione ao menos uma linha para visualizar as conexões da Guanabara.")
-    st.stop()
+if "gua_table" not in st.session_state:
+    st.session_state["gua_table"] = pd.DataFrame(
+        {"Linha": linhas_gua_lista, "Selecionar": [True] * len(linhas_gua_lista)}
+    )
 
-df_gua_filtrado = df_gua[df_gua["DESCRICAO DA LINHA"].isin(selecionadas)]
+if st.session_state.get("last_gua_all") != select_all_gua:
+    st.session_state["gua_table"]["Selecionar"] = select_all_gua
+st.session_state["last_gua_all"] = select_all_gua
 
 # --- Criar DataFrame seguro apenas com coordenadas ---
+col_mapa_gua, col_tabela_gua = st.columns([3, 1])
+
+with col_tabela_gua:
+    gua_table_display = st.data_editor(
+        st.session_state["gua_table"],
+        hide_index=True,
+        column_config={"Selecionar": st.column_config.CheckboxColumn("Selecionar")},
+        key="editor_gua",
+        height=800,
+        use_container_width=True,
+    )
+    st.session_state["gua_table"] = gua_table_display
+    linhas_gua_selecionadas = gua_table_display[gua_table_display["Selecionar"]]["Linha"].tolist()
+
+df_gua_filtrado = df_gua[df_gua["LINHA_COMPLETA"].isin(linhas_gua_selecionadas)]
+
 df_gua_pontos = df_gua_filtrado[["LAT", "LON"]].copy()
 df_gua_pontos = df_gua_pontos.dropna()
 df_gua_pontos["lat"] = df_gua_pontos["LAT"].astype(float)
@@ -230,17 +283,13 @@ linha_horizontal_gua = pdk.Layer(
     gap_size=2,
 )
 
+
 # --- View inicial centralizada ---
 view_state_gua = pdk.ViewState(
     latitude=df_gua_filtrado["LAT"].mean(),
     longitude=df_gua_filtrado["LON"].mean(),
     zoom=5,
 )
-
-# --- Mostrar o mapa da Guanabara ---
-
-# --- Mostrar mapa e lista de linhas da Guanabara lado a lado ---
-col_mapa_gua, col_tabela_gua = st.columns([3, 1])
 
 with col_mapa_gua:
     st.pydeck_chart(
@@ -256,13 +305,6 @@ with col_mapa_gua:
         use_container_width=True,
         height=800,
     )
-
-with col_tabela_gua:
-    linhas_gua_df = pd.DataFrame(
-        sorted(df_gua_filtrado["DESCRICAO DA LINHA"].unique()),
-        columns=["LINHA"]
-    )
-    st.dataframe(linhas_gua_df, hide_index=True, height=800)
 
 # --- Mostrar os dados da Guanabara ---
 with st.expander("🔍 Ver dados utilizados - Guanabara"):
