@@ -52,7 +52,7 @@ if st.session_state.get("last_itap_all") != select_all_itap:
 st.session_state["last_itap_all"] = select_all_itap
 
 # --- Mostrar mapa e lista de linhas da Itapemirim lado a lado ---
-col_mapa_itap, col_tabela_itap = st.columns([3, 1])
+
 
 with col_tabela_itap:
     itap_table_display = st.data_editor(
@@ -61,7 +61,7 @@ with col_tabela_itap:
         column_config={"Selecionar": st.column_config.CheckboxColumn("Selecionar")},
         key="editor_itap",
         height=800,
-        use_container_width=True,
+
     )
     st.session_state["itap_table"] = itap_table_display
     linhas_itap_selecionadas = itap_table_display[
@@ -204,8 +204,7 @@ if st.session_state.get("last_gua_all") != select_all_gua:
     st.session_state["gua_table"]["Selecionar"] = select_all_gua
 st.session_state["last_gua_all"] = select_all_gua
 
-# --- Criar DataFrame seguro apenas com coordenadas ---
-col_mapa_gua, col_tabela_gua = st.columns([3, 1])
+
 
 with col_tabela_gua:
     gua_table_display = st.data_editor(
@@ -214,7 +213,7 @@ with col_tabela_gua:
         column_config={"Selecionar": st.column_config.CheckboxColumn("Selecionar")},
         key="editor_gua",
         height=800,
-        use_container_width=True,
+
     )
     st.session_state["gua_table"] = gua_table_display
     linhas_gua_selecionadas = gua_table_display[gua_table_display["Selecionar"]]["Linha"].tolist()
