@@ -48,7 +48,7 @@ def gerar_tabela_horarios():
 
         contagem = feira["Faixa"].value_counts().sort_index()
         resultado = contagem.reset_index()
-        resultado.columns = ["Faixa de horário", "Quantidade de incidências"]
+        resultado.columns = ["Faixa de horário", "Quantidade de incidências semanais"]
 
         # Adiciona linha de totais
         total = resultado["Quantidade de incidências"].sum()
