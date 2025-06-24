@@ -49,6 +49,17 @@ def gerar_tabela_horarios():
         contagem = feira["Faixa"].value_counts().sort_index()
         resultado = contagem.reset_index()
         resultado.columns = ["Faixa de horário", "Quantidade de incidências"]
+
+        # Adiciona linha de totais
+        total = resultado["Quantidade de incidências"].sum()
+        total_row = pd.DataFrame(
+            {
+                "Faixa de horário": ["Total"],
+                "Quantidade de incidências": [total],
+            }
+        )
+        resultado = pd.concat([resultado, total_row], ignore_index=True)
+        
         return resultado
     except Exception as e:
         st.error(f"Erro ao gerar tabela de horários: {e}")
