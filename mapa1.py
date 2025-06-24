@@ -145,6 +145,7 @@ view_state = pdk.ViewState(
     zoom=5,
 )
 
+st.subheader("Itapemirim")
 # --- Mostrar mapa e lista de linhas da Itapemirim lado a lado ---
 col_mapa_itap, col_tabela_itap = st.columns([3, 1])
 
@@ -287,6 +288,7 @@ view_state_gua = pdk.ViewState(
     zoom=5,
 )
 
+st.subheader("Guanabara")
 # --- Mostrar o mapa da Guanabara ---
 
 # --- Mostrar mapa e lista de linhas da Guanabara lado a lado ---
