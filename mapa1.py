@@ -204,6 +204,8 @@ if df_gua.empty:
 # --- Ordenar os dados pela sequência das cidades dentro de cada linha ---
 df_gua = df_gua.sort_values(by=["PREFIXO", "DESCRICAO DA LINHA", "SEQUENCIA"])
 
+st.subheader("Guanabara")
+
 # --- Filtro de linhas ---
 linhas_unicas = sorted(df_gua["DESCRICAO DA LINHA"].unique())
 selecionadas = st.multiselect(
@@ -287,8 +289,6 @@ view_state_gua = pdk.ViewState(
     longitude=df_gua_filtrado["LON"].mean(),
     zoom=5,
 )
-
-st.subheader("Guanabara")
 # --- Mostrar o mapa da Guanabara ---
 
 # --- Mostrar mapa e lista de linhas da Guanabara lado a lado ---
