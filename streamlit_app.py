@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 st.title("🕒 Timeline Operacional com Zoom e Dias da Semana")
 
 # === LEITURA DA PLANILHA ===
-arquivo = r"C:\\Users\\vpurcinelli\\Documents\\estudo_hub_fsa\\estudo_linhas\\GANT\\Planejamento operacional(2).xlsx"
+arquivo = "Planejamento operacional(2).xlsx"
 df = pd.read_excel(arquivo)
 
 # === PREPARAÇÃO DOS DADOS ===
