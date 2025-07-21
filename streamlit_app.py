@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.io as pio
-import streamlit.components.v1 as components
 from datetime import datetime
 
 # === CONFIGURAÇÃO STREAMLIT ===
@@ -50,7 +48,7 @@ df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 # === GRÁFICO ===
 fig = go.Figure()
 
-# 1. Desenha os retângulos com textos
+# 1. Desenha os retângulos
 for empresa, grupo in df.groupby("EMPRESA"):
     fig.add_trace(
         go.Bar(
@@ -65,10 +63,6 @@ for empresa, grupo in df.groupby("EMPRESA"):
             legendgroup=empresa,
             width=0.35,
             customdata=grupo[["ORIGEM", "DESTINO", "HORA PARTIDA", "HORA CHEGADA"]],
-            text=grupo["ORIGEM"] + " → " + grupo["DESTINO"],
-            textposition="inside",
-            insidetextanchor="middle",
-            textfont=dict(size=12, color="black", family="Arial Black"),
             hovertemplate=(
                 "<b>%{y}</b><br>" +
                 "Origem: %{customdata[0]} → %{customdata[1]}<br>" +
@@ -79,6 +73,38 @@ for empresa, grupo in df.groupby("EMPRESA"):
             xaxis="x2",
         )
     )
+
+# 2. Textos (origem e destino)
+for empresa, grupo in df.groupby("EMPRESA"):
+    fig.add_trace(go.Bar(
+        x=grupo["DURACAO_H"],
+        y=grupo["VIAGEM"],
+        base=grupo["HORA_ABSOLUTA"],
+        orientation="h",
+        marker=dict(color='rgba(0,0,0,0)'),
+        text=grupo["ORIGEM"],
+        textposition="inside",
+        insidetextanchor="start",
+        textfont=dict(size=12, color="black", family="Arial Black"),
+        showlegend=False,
+        hoverinfo="skip",
+        xaxis="x2"
+    ))
+
+    fig.add_trace(go.Bar(
+        x=grupo["DURACAO_H"],
+        y=grupo["VIAGEM"],
+        base=grupo["HORA_ABSOLUTA"],
+        orientation="h",
+        marker=dict(color='rgba(0,0,0,0)'),
+        text=grupo["DESTINO"],
+        textposition="inside",
+        insidetextanchor="end",
+        textfont=dict(size=12, color="black", family="Arial Black"),
+        showlegend=False,
+        hoverinfo="skip",
+        xaxis="x2"
+    ))
 
 # === GRADE DE HORAS E DIAS ===
 dias_semana = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER", "QUA"]
@@ -174,42 +200,4 @@ config = {
     "displayModeBar": True,
     "responsive": True
 }
-html_graph = pio.to_html(
-    fig,
-    include_plotlyjs="cdn",
-    full_html=False,
-    config=config,
-    div_id="timeline"
-)
-html_graph += """
-<script>
-function updateLabels(gd){
-  var xaxis = gd._fullLayout.xaxis2;
-  var range = xaxis.range;
-  var axisLen = xaxis._length;
-  gd.data.forEach(function(trace, idx){
-    if(trace.type !== 'bar') return;
-    var fullTexts = trace.customdata.map(d => d[0] + ' \u2192 ' + d[1]);
-    var destTexts = trace.customdata.map(d => d[1]);
-    var durations = trace.x;
-    var texts = [];
-    var anchors = [];
-    for(var i=0;i<durations.length;i++){
-      var widthPx = durations[i] / (range[1]-range[0]) * axisLen;
-      var needed = fullTexts[i].length * 7;
-      if(widthPx < needed){
-        texts.push(destTexts[i]);
-        anchors.push('end');
-      } else {
-        texts.push(fullTexts[i]);
-        anchors.push('middle');
-      }
-    }
-    Plotly.restyle(gd, {text:[texts], insidetextanchor:[anchors]}, [idx]);
-  });
-}
-var gd = document.getElementById('timeline');
-if(gd){ updateLabels(gd); gd.on('plotly_relayout', () => updateLabels(gd)); }
-</script>
-"""
-components.html(html_graph, height=fig.layout.height + 150, scrolling=True)
+st.plotly_chart(fig, use_container_width=True, config=config)
