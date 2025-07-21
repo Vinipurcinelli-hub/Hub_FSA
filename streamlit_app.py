@@ -23,11 +23,13 @@ def load_data(path: str):
     ).dt.total_seconds() / 3600
     df = df[df["DURACAO_H"] > 0].copy()
 
-    dias_offset = (df["HORA PARTIDA"].dt.weekday - 2) % 7
+    # Calcula a diferença, em horas, entre a primeira quarta-feira e cada
+    # horário de partida para manter a continuidade mesmo após a troca de semana
+    primeira_data = df["HORA PARTIDA"].min().normalize()
+    dias_ate_quarta = (primeira_data.weekday() - 2) % 7
+    quarta_inicial = primeira_data - pd.Timedelta(days=dias_ate_quarta)
     df["HORA_ABSOLUTA"] = (
-        dias_offset * 24
-        + df["HORA PARTIDA"].dt.hour
-        + df["HORA PARTIDA"].dt.minute / 60
+        (df["HORA PARTIDA"] - quarta_inicial).dt.total_seconds() / 3600
     )
     df["COR"] = df["EMPRESA"].map(CORES).fillna("gray")
 
@@ -107,9 +109,19 @@ for empresa, grupo in df.groupby("EMPRESA"):
     ))
 
 # === GRADE DE HORAS E DIAS ===
-dias_semana = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER", "QUA"]
-ticks_dias = [i * 24 for i in range(8)]
-x_ticks = list(range(0, 24 * 8 + 1))
+x_ticks = list(range(0, 24 * 9 + 1))
+dias_semana = [
+    "QUA",
+    "QUI",
+    "SEX",
+    "SÁB",
+    "DOM",
+    "SEG",
+    "TER",
+    "QUA",
+    "QUI",
+]
+ticks_dias = [i * 24 for i in range(9)]
 x_labels = [str(h % 24) if h % 24 != 0 else "" for h in x_ticks]
 
 # Delimitações entre os dias
@@ -126,8 +138,8 @@ for x in ticks_dias:
         layer="below",
     )
 
-# Fundo verde claro de 07:00 às 22:00
-for dia in range(7):
+# Fundo verde claro de 07:00 às 22:00 para cada um dos nove dias
+for dia in range(9):
     fig.add_shape(
         type="rect",
         x0=dia * 24 + 7,
@@ -175,7 +187,7 @@ fig.update_layout(
         tickfont=dict(size=9),
         ticks="outside",
         title="Horário do Dia",
-        range=[0, 24 * 8],
+        range=[0, 24 * 9],
     ),
     yaxis=dict(
         title="VIAGEM",
