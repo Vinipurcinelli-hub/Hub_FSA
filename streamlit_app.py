@@ -78,63 +78,65 @@ for empresa, grupo in df.groupby("EMPRESA"):
         )
     )
 
-# 2. Textos inteligentes (exibe origem/destino com base na posição na viagem)
-for empresa, grupo in df.groupby("EMPRESA"):
-    textos_esquerda = []
-    textos_direita = []
+# 2. Textos com lógica precisa (considerando posição dentro da VIAGEM)
+textos_esquerda = []
+textos_direita = []
 
-    for _, row in grupo.iterrows():
+for viagem_id, grupo_viagem in df.groupby("VIAGEM"):
+    idxs = grupo_viagem.index.tolist()
+    for i, idx in enumerate(idxs):
+        row = df.loc[idx]
         if row["DURACAO_H"] >= LIMIAR_TEXTO:
             textos_esquerda.append(row["ORIGEM"])
             textos_direita.append(row["DESTINO"])
         else:
-            if row["IS_PRIMEIRO"]:
+            if i == 0:
                 textos_esquerda.append(row["ORIGEM"])
                 textos_direita.append("")
-            elif row["IS_ULTIMO"]:
+            elif i == len(idxs) - 1:
                 textos_esquerda.append("")
                 textos_direita.append(row["DESTINO"])
             else:
                 textos_esquerda.append("")
                 textos_direita.append("")
 
-    # ORIGEM (esquerda)
-    fig.add_trace(
-        go.Bar(
-            x=grupo["DURACAO_H"],
-            y=grupo["VIAGEM"],
-            base=grupo["HORA_ABSOLUTA"],
-            orientation="h",
-            marker=dict(color="rgba(0,0,0,0)"),
-            text=textos_esquerda,
-            textposition="inside",
-            insidetextanchor="start",
-            textfont=dict(size=12, color="black", family="Arial Black"),
-            textangle=0,
-            showlegend=False,
-            hoverinfo="skip",
-            xaxis="x2",
-        )
-    )
+# Agora insere os textos em dois traces transparentes
 
-    # DESTINO (direita)
-    fig.add_trace(
-        go.Bar(
-            x=grupo["DURACAO_H"],
-            y=grupo["VIAGEM"],
-            base=grupo["HORA_ABSOLUTA"],
-            orientation="h",
-            marker=dict(color="rgba(0,0,0,0)"),
-            text=textos_direita,
-            textposition="inside",
-            insidetextanchor="end",
-            textfont=dict(size=12, color="black", family="Arial Black"),
-            textangle=0,
-            showlegend=False,
-            hoverinfo="skip",
-            xaxis="x2",
-        )
+fig.add_trace(
+    go.Bar(
+        x=df["DURACAO_H"],
+        y=df["VIAGEM"],
+        base=df["HORA_ABSOLUTA"],
+        orientation="h",
+        marker=dict(color="rgba(0,0,0,0)"),
+        text=textos_esquerda,
+        textposition="inside",
+        insidetextanchor="start",
+        textangle=0,
+        textfont=dict(size=12, color="black", family="Arial Black"),
+        showlegend=False,
+        hoverinfo="skip",
+        xaxis="x2",
     )
+)
+
+fig.add_trace(
+    go.Bar(
+        x=df["DURACAO_H"],
+        y=df["VIAGEM"],
+        base=df["HORA_ABSOLUTA"],
+        orientation="h",
+        marker=dict(color="rgba(0,0,0,0)"),
+        text=textos_direita,
+        textposition="inside",
+        insidetextanchor="end",
+        textangle=0,
+        textfont=dict(size=12, color="black", family="Arial Black"),
+        showlegend=False,
+        hoverinfo="skip",
+        xaxis="x2",
+    )
+)
 
 # === GRADE DE HORAS E DIAS ===
 x_ticks = list(range(0, 24 * 9 + 1))
