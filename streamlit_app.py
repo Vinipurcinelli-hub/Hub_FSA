@@ -5,7 +5,7 @@ from datetime import datetime
 
 # === CONFIGURAÇÃO STREAMLIT ===
 st.set_page_config(layout="wide")
-st.title("🕒 Timeline Operacional")
+st.title("🕒 Timeline Operacional - HUB FSA - GUANABARA + ITAPEMIRIM")
 
 # === CONSTANTES ===
 CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
