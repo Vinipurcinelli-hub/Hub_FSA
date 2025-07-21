@@ -34,7 +34,7 @@ df["COR"] = df["EMPRESA"].map(cores).fillna("gray")
 dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
 
 # Order trips by weekday from QUA to TER
-ordem_dias = ["QUA", "QUI", "SEX", "SAB", "DOM", "SEG", "TER"]
+ordem_dias = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
 viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
 viagens_ordenadas = sorted(
     viagem_dia.index,
