@@ -33,7 +33,7 @@ df["COR"] = df["EMPRESA"].map(cores).fillna("gray")
 # Determine the column that stores the weekday information
 dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
 
-# Order trips by weekday from QUA to TER
+# Order trips by weekday from QUA to TER and apply ordering on the y axis
 ordem_dias = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
 viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
 viagens_ordenadas = sorted(
@@ -41,8 +41,9 @@ viagens_ordenadas = sorted(
     key=lambda v: ordem_dias.index(viagem_dia.loc[v])
 )
 
-mapa_viagens = {viagem: i for i, viagem in enumerate(viagens_ordenadas)}
-df["VIAGEM_Y"] = df["VIAGEM"].map(mapa_viagens)
+# Keep VIAGEM as a categorical column with the desired ordering
+df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
+df.sort_values("VIAGEM", inplace=True)
 
 # === GRÁFICO ===
 fig = go.Figure()
@@ -176,7 +177,9 @@ fig.update_layout(
     yaxis=dict(
         title="VIAGEM",
         autorange="reversed",
-        tickfont=dict(size=11)
+        tickfont=dict(size=11),
+        categoryorder="array",
+        categoryarray=viagens_ordenadas
     ),
     height=500 + 50 * len(viagens_ordenadas),
     margin=dict(l=100, r=40, t=100, b=80),
