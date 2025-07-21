@@ -7,69 +7,72 @@ from datetime import datetime
 st.set_page_config(layout="wide")
 st.title("🕒 Timeline Operacional com Zoom e Dias da Semana")
 
-# === LEITURA DA PLANILHA ===
-arquivo = "Planejamento operacional.xlsx"
-df = pd.read_excel(arquivo)
+# === CONSTANTES ===
+CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
+ORDEM_DIAS = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
 
-# === PREPARAÇÃO DOS DADOS ===
-df["HORA PARTIDA"] = pd.to_datetime(df["HORA PARTIDA"])
-df["HORA CHEGADA"] = pd.to_datetime(df["HORA CHEGADA"])
-df["DURACAO_H"] = (df["HORA CHEGADA"] - df["HORA PARTIDA"]).dt.total_seconds() / 3600
-df = df[df["DURACAO_H"] > 0].copy()
 
-# === FIXAR A BASE COMO QUARTA-FEIRA 00:00 ===
-dias_offset = (df["HORA PARTIDA"].dt.weekday - 2) % 7  # quarta-feira = 2
-df["HORA_ABSOLUTA"] = dias_offset * 24 + df["HORA PARTIDA"].dt.hour + df["HORA PARTIDA"].dt.minute / 60
+@st.cache_data
+def load_data(path: str):
+    """Carrega a planilha e prepara as colunas utilizadas no gráfico."""
+    df = pd.read_excel(path)
+    df["HORA PARTIDA"] = pd.to_datetime(df["HORA PARTIDA"])
+    df["HORA CHEGADA"] = pd.to_datetime(df["HORA CHEGADA"])
+    df["DURACAO_H"] = (
+        df["HORA CHEGADA"] - df["HORA PARTIDA"]
+    ).dt.total_seconds() / 3600
+    df = df[df["DURACAO_H"] > 0].copy()
 
-# === CORES POR EMPRESA ===
-cores = {
-    "GUANABARA": "royalblue",
-    "ITAPEMIRIM": "gold",
-    "HUB": "firebrick"
-}
-df["COR"] = df["EMPRESA"].map(cores).fillna("gray")
+    dias_offset = (df["HORA PARTIDA"].dt.weekday - 2) % 7
+    df["HORA_ABSOLUTA"] = (
+        dias_offset * 24
+        + df["HORA PARTIDA"].dt.hour
+        + df["HORA PARTIDA"].dt.minute / 60
+    )
+    df["COR"] = df["EMPRESA"].map(CORES).fillna("gray")
 
-# === EIXO Y ===
-# Determine the column that stores the weekday information
-dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
+    dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
+    viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
+    viagens_ordenadas = sorted(
+        viagem_dia.index, key=lambda v: ORDEM_DIAS.index(viagem_dia.loc[v])
+    )
+    df["VIAGEM"] = pd.Categorical(
+        df["VIAGEM"], categories=viagens_ordenadas, ordered=True
+    )
+    df.sort_values("VIAGEM", inplace=True)
+    return df, viagens_ordenadas
 
-# Order trips by weekday from QUA to TER and apply ordering on the y axis
-ordem_dias = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
-viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
-viagens_ordenadas = sorted(
-    viagem_dia.index,
-    key=lambda v: ordem_dias.index(viagem_dia.loc[v])
-)
 
-# Keep VIAGEM as a categorical column with the desired ordering
-df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
-df.sort_values("VIAGEM", inplace=True)
+df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 
 # === GRÁFICO ===
 fig = go.Figure()
 
 # 1. Desenha os retângulos
 for empresa, grupo in df.groupby("EMPRESA"):
-    fig.add_trace(go.Bar(
-        x=grupo["DURACAO_H"],
-        y=grupo["VIAGEM"],
-        base=grupo["HORA_ABSOLUTA"],
-        orientation="h",
-        marker=dict(color=cores.get(empresa, "gray"),
-                    line=dict(color="black", width=1)),
-        name=empresa,
-        legendgroup=empresa,
-        width=0.35,
-        customdata=grupo[["ORIGEM", "DESTINO", "HORA PARTIDA", "HORA CHEGADA"]],
-        hovertemplate=(
-            "<b>%{y}</b><br>" +
-            "Origem: %{customdata[0]} → %{customdata[1]}<br>" +
-            "Início: %{customdata[2]|%d/%m %H:%M}<br>" +
-            "Fim: %{customdata[3]|%d/%m %H:%M}<br>" +
-            "Duração: %{x:.1f}h"
+    fig.add_trace(
+        go.Bar(
+            x=grupo["DURACAO_H"],
+            y=grupo["VIAGEM"],
+            base=grupo["HORA_ABSOLUTA"],
+            orientation="h",
+            marker=dict(
+                color=CORES.get(empresa, "gray"), line=dict(color="black", width=1)
+            ),
+            name=empresa,
+            legendgroup=empresa,
+            width=0.35,
+            customdata=grupo[["ORIGEM", "DESTINO", "HORA PARTIDA", "HORA CHEGADA"]],
+            hovertemplate=(
+                "<b>%{y}</b><br>" +
+                "Origem: %{customdata[0]} → %{customdata[1]}<br>" +
+                "Início: %{customdata[2]|%d/%m %H:%M}<br>" +
+                "Fim: %{customdata[3]|%d/%m %H:%M}<br>" +
+                "Duração: %{x:.1f}h"
         ),
-        xaxis="x2"
-    ))
+            xaxis="x2",
+        )
+    )
 
 # 2. Textos (origem e destino)
 for empresa, grupo in df.groupby("EMPRESA"):
@@ -104,25 +107,23 @@ for empresa, grupo in df.groupby("EMPRESA"):
     ))
 
 # === GRADE DE HORAS E DIAS ===
-dias_semana = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER","QUA"]
+dias_semana = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER", "QUA"]
 ticks_dias = [i * 24 for i in range(8)]
 x_ticks = list(range(0, 24 * 8 + 1))
 x_labels = [str(h % 24) if h % 24 != 0 else "" for h in x_ticks]
 
-# Linhas verticais
-for x in x_ticks:
+# Delimitações entre os dias
+for x in ticks_dias:
     fig.add_shape(
         type="line",
-        x0=x, x1=x,
-        y0=0, y1=1,
+        x0=x,
+        x1=x,
+        y0=0,
+        y1=1,
         xref="x2",
         yref="paper",
-        line=dict(
-            color="white" if x % 24 == 0 else "lightgray",
-            width=3 if x % 24 == 0 else 1,
-            dash="solid" if x % 24 == 0 else "dot"
-        ),
-        layer="below"
+        line=dict(color="white", width=3),
+        layer="below",
     )
 
 # Fundo verde claro de 07:00 às 22:00
@@ -163,16 +164,18 @@ fig.update_layout(
     xaxis=dict(visible=False),
     xaxis2=dict(
         domain=[0.0, 1.0],
-        anchor='y',
+        anchor="y",
         tickmode="array",
         tickvals=x_ticks,
         ticktext=x_labels,
         showgrid=True,
-        gridcolor="gray",
+        gridcolor="lightgray",
+        griddash="dot",
         ticklen=3,
         tickfont=dict(size=9),
         ticks="outside",
-        title="Horário do Dia"
+        title="Horário do Dia",
+        range=[0, 24 * 8],
     ),
     yaxis=dict(
         title="VIAGEM",
