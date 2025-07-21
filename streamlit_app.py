@@ -30,8 +30,18 @@ cores = {
 df["COR"] = df["EMPRESA"].map(cores).fillna("gray")
 
 # === EIXO Y ===
-viagens_unicos = df["VIAGEM"].unique()
-mapa_viagens = {viagem: i for i, viagem in enumerate(viagens_unicos)}
+# Determine the column that stores the weekday information
+dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
+
+# Order trips by weekday from QUA to TER
+ordem_dias = ["QUA", "QUI", "SEX", "SAB", "DOM", "SEG", "TER"]
+viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
+viagens_ordenadas = sorted(
+    viagem_dia.index,
+    key=lambda v: ordem_dias.index(viagem_dia.loc[v])
+)
+
+mapa_viagens = {viagem: i for i, viagem in enumerate(viagens_ordenadas)}
 df["VIAGEM_Y"] = df["VIAGEM"].map(mapa_viagens)
 
 # === GRÁFICO ===
@@ -168,7 +178,7 @@ fig.update_layout(
         autorange="reversed",
         tickfont=dict(size=11)
     ),
-    height=500 + 50 * len(viagens_unicos),
+    height=500 + 50 * len(viagens_ordenadas),
     margin=dict(l=100, r=40, t=100, b=80),
     title=dict(
         text="Timeline Operacional – Dias da Semana com Zoom Inteligente",
