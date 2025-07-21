@@ -12,7 +12,6 @@ CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
 ORDEM_DIAS = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
 LIMIAR_TEXTO = 8  # horas
 
-
 @st.cache_data
 def load_data(path: str):
     """Carrega a planilha e prepara as colunas utilizadas no gráfico."""
@@ -42,19 +41,8 @@ def load_data(path: str):
     df["VIAGEM"] = pd.Categorical(
         df["VIAGEM"], categories=viagens_ordenadas, ordered=True
     )
-    df.sort_values(["VIAGEM", "HORA PARTIDA"], inplace=True)
-
-    df["SHOW_ORIGEM"] = ""
-    df["SHOW_DESTINO"] = ""
-    for viagem, g in df.groupby("VIAGEM"):
-        idx_first = g.index[0]
-        idx_last = g.index[-1]
-        if g.loc[idx_first, "DURACAO_H"] > LIMIAR_TEXTO:
-            df.loc[idx_first, "SHOW_ORIGEM"] = g.loc[idx_first, "ORIGEM"]
-        df.loc[idx_last, "SHOW_DESTINO"] = g.loc[idx_last, "DESTINO"]
-
+    df.sort_values("VIAGEM", inplace=True)
     return df, viagens_ordenadas
-
 
 df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 
