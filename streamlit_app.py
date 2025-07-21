@@ -49,6 +49,9 @@ df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 # === GRÁFICO ===
 fig = go.Figure()
 
+df["IS_PRIMEIRO"] = df.groupby("VIAGEM").cumcount() == 0
+df["IS_ULTIMO"] = df.groupby("VIAGEM").cumcount(ascending=False) == 0
+
 # 1. Desenha os retângulos
 for empresa, grupo in df.groupby("EMPRESA"):
     fig.add_trace(
@@ -75,13 +78,27 @@ for empresa, grupo in df.groupby("EMPRESA"):
         )
     )
 
-# 2. Textos (origem e destino)
-LIMIAR_TEXTO = 8  # horas
+# 2. Textos inteligentes (exibe origem/destino com base na posição na viagem)
 for empresa, grupo in df.groupby("EMPRESA"):
-    textos_origem = [
-        origem if dur >= LIMIAR_TEXTO else ""
-        for origem, dur in zip(grupo["ORIGEM"], grupo["DURACAO_H"])
-    ]
+    textos_esquerda = []
+    textos_direita = []
+
+    for _, row in grupo.iterrows():
+        if row["DURACAO_H"] >= LIMIAR_TEXTO:
+            textos_esquerda.append(row["ORIGEM"])
+            textos_direita.append(row["DESTINO"])
+        else:
+            if row["IS_PRIMEIRO"]:
+                textos_esquerda.append(row["ORIGEM"])
+                textos_direita.append("")
+            elif row["IS_ULTIMO"]:
+                textos_esquerda.append("")
+                textos_direita.append(row["DESTINO"])
+            else:
+                textos_esquerda.append("")
+                textos_direita.append("")
+
+    # ORIGEM (esquerda)
     fig.add_trace(
         go.Bar(
             x=grupo["DURACAO_H"],
@@ -89,16 +106,18 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(color="rgba(0,0,0,0)"),
-            text=textos_origem,
+            text=textos_esquerda,
             textposition="inside",
             insidetextanchor="start",
             textfont=dict(size=12, color="black", family="Arial Black"),
+            textangle=0,
             showlegend=False,
             hoverinfo="skip",
             xaxis="x2",
         )
     )
 
+    # DESTINO (direita)
     fig.add_trace(
         go.Bar(
             x=grupo["DURACAO_H"],
@@ -106,10 +125,11 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(color="rgba(0,0,0,0)"),
-            text=grupo["DESTINO"],
+            text=textos_direita,
             textposition="inside",
             insidetextanchor="end",
             textfont=dict(size=12, color="black", family="Arial Black"),
+            textangle=0,
             showlegend=False,
             hoverinfo="skip",
             xaxis="x2",
