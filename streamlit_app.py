@@ -10,6 +10,7 @@ st.title("🕒 Timeline Operacional - HUB FSA - GUANABARA + ITAPEMIRIM")
 # === CONSTANTES ===
 CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
 ORDEM_DIAS = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
+LIMIAR_TEXTO = 8  # horas
 
 
 @st.cache_data
@@ -41,7 +42,17 @@ def load_data(path: str):
     df["VIAGEM"] = pd.Categorical(
         df["VIAGEM"], categories=viagens_ordenadas, ordered=True
     )
-    df.sort_values("VIAGEM", inplace=True)
+    df.sort_values(["VIAGEM", "HORA PARTIDA"], inplace=True)
+
+    df["SHOW_ORIGEM"] = ""
+    df["SHOW_DESTINO"] = ""
+    for viagem, g in df.groupby("VIAGEM"):
+        idx_first = g.index[0]
+        idx_last = g.index[-1]
+        if g.loc[idx_first, "DURACAO_H"] > LIMIAR_TEXTO:
+            df.loc[idx_first, "SHOW_ORIGEM"] = g.loc[idx_first, "ORIGEM"]
+        df.loc[idx_last, "SHOW_DESTINO"] = g.loc[idx_last, "DESTINO"]
+
     return df, viagens_ordenadas
 
 
@@ -77,12 +88,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
     )
 
 # 2. Textos (origem e destino)
-LIMIAR_TEXTO = 8  # horas
 for empresa, grupo in df.groupby("EMPRESA"):
-    textos_origem = [
-        origem if dur >= LIMIAR_TEXTO else ""
-        for origem, dur in zip(grupo["ORIGEM"], grupo["DURACAO_H"])
-    ]
     fig.add_trace(
         go.Bar(
             x=grupo["DURACAO_H"],
@@ -90,7 +96,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(color="rgba(0,0,0,0)"),
-            text=textos_origem,
+            text=grupo["SHOW_ORIGEM"],
             textposition="inside",
             insidetextanchor="start",
             textfont=dict(size=12, color="black", family="Arial Black"),
@@ -107,7 +113,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(color="rgba(0,0,0,0)"),
-            text=grupo["DESTINO"],
+            text=grupo["SHOW_DESTINO"],
             textposition="inside",
             insidetextanchor="end",
             textfont=dict(size=12, color="black", family="Arial Black"),
