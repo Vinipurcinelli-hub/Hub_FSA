@@ -77,11 +77,11 @@ for empresa, grupo in df.groupby("EMPRESA"):
     )
 
 # 2. Textos (origem e destino)
-LIMIAR_TEXTO = 4  # horas
+LIMIAR_TEXTO = 8  # horas
 for empresa, grupo in df.groupby("EMPRESA"):
-    textos = [
-        f"{o} → {d}" if dur >= LIMIAR_TEXTO else d
-        for o, d, dur in zip(grupo["ORIGEM"], grupo["DESTINO"], grupo["DURACAO_H"])
+    textos_origem = [
+        origem if dur >= LIMIAR_TEXTO else ""
+        for origem, dur in zip(grupo["ORIGEM"], grupo["DURACAO_H"])
     ]
     fig.add_trace(
         go.Bar(
@@ -90,9 +90,26 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(color="rgba(0,0,0,0)"),
-            text=textos,
+            text=textos_origem,
             textposition="inside",
-            insidetextanchor="middle",
+            insidetextanchor="start",
+            textfont=dict(size=12, color="black", family="Arial Black"),
+            showlegend=False,
+            hoverinfo="skip",
+            xaxis="x2",
+        )
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=grupo["DURACAO_H"],
+            y=grupo["VIAGEM"],
+            base=grupo["HORA_ABSOLUTA"],
+            orientation="h",
+            marker=dict(color="rgba(0,0,0,0)"),
+            text=grupo["DESTINO"],
+            textposition="inside",
+            insidetextanchor="end",
             textfont=dict(size=12, color="black", family="Arial Black"),
             showlegend=False,
             hoverinfo="skip",
