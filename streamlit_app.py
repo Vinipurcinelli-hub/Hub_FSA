@@ -77,7 +77,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
     )
 
 # 2. Textos (origem e destino)
-LIMIAR_TEXTO = 4  # horas
+LIMIAR_TEXTO = 8  # horas
 for empresa, grupo in df.groupby("EMPRESA"):
     textos = [
         f"{o} → {d}" if dur >= LIMIAR_TEXTO else d
