@@ -207,7 +207,6 @@ fig.update_layout(
     ),
     height=500 + 50 * len(viagens_ordenadas),
     margin=dict(l=100, r=40, t=100, b=80),
-    ),
     hoverlabel=dict(font_size=11)
 )
 
