@@ -30,9 +30,9 @@ cores = {
 df["COR"] = df["EMPRESA"].map(cores).fillna("gray")
 
 # === EIXO Y ===
-SAIDAs_unicos = df["SAIDA"].unique()
-mapa_SAIDAs = {SAIDA: i for i, SAIDA in enumerate(SAIDAs_unicos)}
-df["SAIDA_Y"] = df["SAIDA"].map(mapa_SAIDAs)
+viagens_unicos = df["VIAGEM"].unique()
+mapa_viagens = {viagem: i for i, viagem in enumerate(viagens_unicos)}
+df["VIAGEM_Y"] = df["VIAGEM"].map(mapa_viagens)
 
 # === GRÁFICO ===
 fig = go.Figure()
@@ -41,7 +41,7 @@ fig = go.Figure()
 for empresa, grupo in df.groupby("EMPRESA"):
     fig.add_trace(go.Bar(
         x=grupo["DURACAO_H"],
-        y=grupo["SAIDA"],
+        y=grupo["VIAGEM"],
         base=grupo["HORA_ABSOLUTA"],
         orientation="h",
         marker=dict(color=cores.get(empresa, "gray"),
@@ -64,7 +64,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
 for empresa, grupo in df.groupby("EMPRESA"):
     fig.add_trace(go.Bar(
         x=grupo["DURACAO_H"],
-        y=grupo["SAIDA"],
+        y=grupo["VIAGEM"],
         base=grupo["HORA_ABSOLUTA"],
         orientation="h",
         marker=dict(color='rgba(0,0,0,0)'),
@@ -79,7 +79,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
 
     fig.add_trace(go.Bar(
         x=grupo["DURACAO_H"],
-        y=grupo["SAIDA"],
+        y=grupo["VIAGEM"],
         base=grupo["HORA_ABSOLUTA"],
         orientation="h",
         marker=dict(color='rgba(0,0,0,0)'),
@@ -164,11 +164,11 @@ fig.update_layout(
         title="Horário do Dia"
     ),
     yaxis=dict(
-        title="SAIDA",
+        title="VIAGEM",
         autorange="reversed",
         tickfont=dict(size=11)
     ),
-    height=500 + 50 * len(SAIDAs_unicos),
+    height=500 + 50 * len(viagens_unicos),
     margin=dict(l=100, r=40, t=100, b=80),
     title=dict(
         text="Timeline Operacional – Dias da Semana com Zoom Inteligente",
