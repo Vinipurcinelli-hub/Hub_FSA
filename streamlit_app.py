@@ -5,7 +5,7 @@ from datetime import datetime
 
 # === CONFIGURAÇÃO STREAMLIT ===
 st.set_page_config(layout="wide")
-st.title("🕒 Timeline Operacional com Zoom e Dias da Semana")
+st.title("🕒 Timeline Operacional")
 
 # === CONSTANTES ===
 CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
@@ -207,10 +207,6 @@ fig.update_layout(
     ),
     height=500 + 50 * len(viagens_ordenadas),
     margin=dict(l=100, r=40, t=100, b=80),
-    title=dict(
-        text="Timeline Operacional – Dias da Semana com Zoom Inteligente",
-        x=0.5,
-        font=dict(size=18)
     ),
     hoverlabel=dict(font_size=11)
 )
