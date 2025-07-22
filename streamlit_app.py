@@ -75,6 +75,18 @@ for empresa, grupo in df.groupby("EMPRESA"):
         )
     )
 
+# 2. Textos para dentro dos blocos — com exceção "SPO" para blocos curtos
+textos_esquerda = []
+textos_direita = []
+
+for idx, row in df.iterrows():
+    if row["DURACAO_H"] >= LIMIAR_TEXTO:
+        textos_esquerda.append(row["ORIGEM"])
+        textos_direita.append(row["DESTINO"])
+    else:
+        textos_esquerda.append("")        # não mostra origem
+        textos_direita.append("SPO")      # mostra apenas "SPO"
+
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
     go.Bar(
