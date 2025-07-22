@@ -67,6 +67,26 @@ df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordere
 # === GRÁFICO ===
 fig = go.Figure()
 
+# 0. Camada de fundo levemente opaca para bloquear a grade atrás dos blocos
+for empresa, grupo in df.groupby("EMPRESA"):
+    fig.add_trace(
+        go.Bar(
+            x=grupo["DURACAO_H"],
+            y=grupo["VIAGEM"],
+            base=grupo["HORA_ABSOLUTA"],
+            orientation="h",
+            marker=dict(
+                color="rgba(0,0,0,0.35)",  # tom escuro translúcido — pode ajustar
+                line=dict(width=0)
+            ),
+            width=0.45,  # levemente maior que os blocos reais
+            showlegend=False,
+            hoverinfo="skip",
+            xaxis="x2"
+        )
+    )
+
+
 # 1. Desenha os retângulos
 for empresa, grupo in df.groupby("EMPRESA"):
     fig.add_trace(
