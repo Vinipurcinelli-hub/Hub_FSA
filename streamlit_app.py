@@ -250,6 +250,7 @@ for cod in sorted(LEGENDA_OBS.keys()):
             name=texto,
             hoverinfo="skip",
             legendgroup="OBS",
+            legendrank=100 + cod,
             xaxis="x2"
         )
     )
