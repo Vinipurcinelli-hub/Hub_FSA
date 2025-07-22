@@ -238,7 +238,8 @@ LEGENDA_OBS = {
 }
 
 # Legenda visual para os códigos de OBS (1 a 4)
-for cod, texto in LEGENDA_OBS.items():
+for cod in sorted(LEGENDA_OBS.keys()):
+    texto = LEGENDA_OBS[cod]
     fig.add_trace(
         go.Scatter(
             x=[None],
