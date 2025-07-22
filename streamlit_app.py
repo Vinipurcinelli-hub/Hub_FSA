@@ -98,26 +98,31 @@ textos_esquerda = []
 textos_direita = []
 
 for idx, row in df.iterrows():
-    parte = row.get("PARTE", 0)
-    if parte == 1:  # bloco à direita (TER) - mostra apenas origem
-        if row["DURACAO_H"] >= LIMIAR_TEXTO:
-            textos_esquerda.append(row["ORIGEM"])
+    dur = row["DURACAO_H"]
+    sentido = str(row.get("SENTIDO", "")).upper().strip()
+
+    # Se o bloco for menor que o limiar, aplica lógica reduzida
+    if dur < LIMIAR_TEXTO:
+        if sentido == "IDA":
+            textos_esquerda.append("")
+            textos_direita.append("SPO")
+        elif sentido == "VOLTA":
+            textos_esquerda.append("SPO")
+            textos_direita.append("")
         else:
             textos_esquerda.append("")
-        textos_direita.append("")
-    elif parte == 2:  # bloco à esquerda (QUA) - mostra apenas destino
-        textos_esquerda.append("")
-        if row["DURACAO_H"] >= LIMIAR_TEXTO:
-            textos_direita.append(row["DESTINO"])
-        else:
             textos_direita.append("SPO")
     else:
-        if row["DURACAO_H"] >= LIMIAR_TEXTO:
+        if sentido == "IDA":
+            textos_esquerda.append("")
+            textos_direita.append(row["DESTINO"])
+        elif sentido == "VOLTA":
+            textos_esquerda.append(row["ORIGEM"])
+            textos_direita.append("")
+        else:
             textos_esquerda.append(row["ORIGEM"])
             textos_direita.append(row["DESTINO"])
-        else:
-            textos_esquerda.append("")        # não mostra origem
-            textos_direita.append("SPO")      # mostra apenas "SPO"
+
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
