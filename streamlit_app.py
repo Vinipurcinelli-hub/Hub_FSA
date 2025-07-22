@@ -47,7 +47,7 @@ def load_data(path: str):
 df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 
 # Considera apenas os primeiros 10 dias (de quarta a sexta da semana seguinte)
-df = df[df["HORA_ABSOLUTA"] < 24 * 10].copy()
+df = df[df["HORA_ABSOLUTA"] < 24 * 7].copy()
 
 # Todos os blocos são tratados de maneira única
 df["PARTE"] = 0
@@ -199,20 +199,10 @@ fig.add_trace(
 )
 
 # === GRADE DE HORAS E DIAS ===
-x_ticks = list(range(0, 24 * 10 + 1))
-dias_semana = [
-    "QUA",
-    "QUI",
-    "SEX",
-    "SÁB",
-    "DOM",
-    "SEG",
-    "TER",
-    "QUA",
-    "QUI",
-    "SEX",
-]
-ticks_dias = [i * 24 for i in range(10)]
+x_ticks = list(range(0, 24 * 7 + 1))
+dias_semana = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
+
+ticks_dias = [i * 24 for i in range(7)]
 x_labels = [str(h % 24) if h % 24 != 0 else "" for h in x_ticks]
 
 # Delimitações entre os dias
@@ -230,7 +220,7 @@ for x in ticks_dias:
     )
 
 # Fundo verde claro de 07:00 às 22:00 para cada um dos dez dias
-for dia in range(10):
+for dia in range(7):
     fig.add_shape(
         type="rect",
         x0=dia * 24 + 7,
@@ -317,7 +307,7 @@ fig.update_layout(
         tickfont=dict(size=9),
         ticks="outside",
         title="Horário do Dia",
-        range=[0, 24 * 10],
+        range=[0, 24 * 7],
     ),
     yaxis=dict(
         title="VIAGEM",
