@@ -245,14 +245,16 @@ for cod in sorted(LEGENDA_OBS.keys()):
             x=[None],
             y=[None],
             mode="markers",
-            marker=dict(size=10, color="white", symbol="circle"),  # cor neutra
+            marker=dict(size=10, color="white", symbol="circle"),
             showlegend=True,
             name=texto,
             hoverinfo="skip",
             legendgroup="OBS",
+            legendrank=cod + 100,  # 100+ para aparecer após as cores
             xaxis="x2"
         )
     )
+
 
 # Layout final
 fig.update_layout(
