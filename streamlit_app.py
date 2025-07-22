@@ -360,7 +360,7 @@ fig.update_layout(
     yaxis=dict(
         title="VIAGEM",
         autorange="reversed",
-        tickfont=dict(size=11),
+        tickfont=dict(size=9),
         categoryorder="array",
         categoryarray=viagens_ordenadas
     ),
