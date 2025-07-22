@@ -76,8 +76,11 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(
-                color="black" if empresa != "HUB" else "rgba(0,0,0,0)",
-                width=1 if empresa != "HUB" else 0
+                color=CORES.get(empresa, "gray"),
+                line=dict(
+                    color="black" if empresa != "HUB" else "rgba(0,0,0,0)",
+                    width=1 if empresa != "HUB" else 0
+                )
             ),
             name=empresa,
             legendgroup=empresa,
