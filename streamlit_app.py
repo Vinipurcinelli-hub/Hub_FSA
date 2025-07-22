@@ -231,9 +231,9 @@ fig.add_trace(
 )
 
 LEGENDA_OBS = {
-    1: "1 - INTEGRADO - FREQ. MÍNIMA",
-    2: "2 - INTEGRADO + HUB GUANABARA",
-    3: "3 - INTERCONEXÕES + HUB GUANABARA",
+    1: "1 - INTEGRADO -<br>FREQ. MÍNIMA",
+    2: "2 - INTEGRADO +<br>HUB GUANABARA",
+    3: "3 - INTERCONEXÕES +<br>HUB GUANABARA",
     4: "4 - FREQ. MÍNIMA"
 }
 
