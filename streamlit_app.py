@@ -79,7 +79,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
                 color="rgba(0,0,0,0.4)",  # tom escuro translúcido — pode ajustar
                 line=dict(width=0)
             ),
-            width=0.5,  # levemente maior que os blocos reais
+            width=0.75,  # levemente maior que os blocos reais
             showlegend=False,
             hoverinfo="skip",
             xaxis="x2"
