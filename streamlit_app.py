@@ -97,35 +97,17 @@ for empresa, grupo in df.groupby("EMPRESA"):
         )
     )
 
-# 2. Textos para dentro dos blocos com lógica inteligente para blocos curtos
+# 2. Textos para dentro dos blocos — com exceção "SPO" para blocos curtos
 textos_esquerda = []
 textos_direita = []
 
-for viagem, grupo in df.groupby("VIAGEM"):
-    grupo = grupo.sort_values("HORA_ABSOLUTA")
-    indices = grupo.index.tolist()
-
-    for i, idx in enumerate(indices):
-        row = df.loc[idx]
-        dur = row["DURACAO_H"]
-
-        if dur >= LIMIAR_TEXTO:
-            textos_esquerda.append(row["ORIGEM"])
-            textos_direita.append(row["DESTINO"])
-        else:
-            if i == 0:
-                # Bloco curto e é o primeiro da viagem → mostra ORIGEM
-                textos_esquerda.append(row["ORIGEM"])
-                textos_direita.append("")
-            elif i == len(indices) - 1:
-                # Bloco curto e é o último da viagem → mostra DESTINO
-                textos_esquerda.append("")
-                textos_direita.append(row["DESTINO"])
-            else:
-                # Bloco curto intermediário → não mostra nada
-                textos_esquerda.append("")
-                textos_direita.append("")
-
+for idx, row in df.iterrows():
+    if row["DURACAO_H"] >= LIMIAR_TEXTO:
+        textos_esquerda.append(row["ORIGEM"])
+        textos_direita.append(row["DESTINO"])
+    else:
+        textos_esquerda.append("")        # não mostra origem
+        textos_direita.append("SPO")      # mostra apenas "SPO"
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
