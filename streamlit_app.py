@@ -370,11 +370,11 @@ fig.update_layout(
         y=1.12,
         xanchor="left",
         x=0,
-        font=dict(size=10),
+        font=dict(size=13),
         traceorder="normal",  # força a sequência correta
     ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=10, r=10, t=60, b=60),
+    margin=dict(l=10, r=10, t=30, b=60),
     hoverlabel=dict(font_size=11)
 )
 
