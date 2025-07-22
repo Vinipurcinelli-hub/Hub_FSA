@@ -51,6 +51,9 @@ df = df[df["HORA_ABSOLUTA"] < 24 * 10].copy()
 
 # Todos os blocos são tratados de maneira única
 df["PARTE"] = 0
+
+# Define qual coluna de dia da semana usar
+dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
 df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(r'(\)\s*-\s*")', r'\1<br>', regex=True)
 
 # Recalcula os ordenamentos com os nomes já formatados
