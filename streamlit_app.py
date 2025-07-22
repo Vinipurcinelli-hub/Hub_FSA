@@ -101,7 +101,7 @@ for idx, row in df.iterrows():
     dur = row["DURACAO_H"]
     sentido = str(row.get("SENTIDO", "")).upper().strip()
 
-    if dur < 10:
+    if dur < LIMIAR_TEXTO:
         if sentido == "IDA":
             textos_esquerda.append("")
             textos_direita.append(row["DESTINO"])
@@ -112,15 +112,9 @@ for idx, row in df.iterrows():
             textos_esquerda.append("")
             textos_direita.append("")
     else:
-        if sentido == "IDA":
-            textos_esquerda.append("")
-            textos_direita.append(row["DESTINO"])
-        elif sentido == "VOLTA":
-            textos_esquerda.append(row["ORIGEM"])
-            textos_direita.append("")
-        else:
-            textos_esquerda.append(row["ORIGEM"])
-            textos_direita.append(row["DESTINO"])
+        textos_esquerda.append(row["ORIGEM"])
+        textos_direita.append(row["DESTINO"])
+
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
