@@ -193,7 +193,7 @@ fig.add_trace(
         mode="markers",
         marker=dict(size=10, color="rgba(144,238,144,0.2)", symbol="square"),
         showlegend=True,
-        name="HUB",
+        name="Horário HUB - FSA (07:00 às 22:00)",
         hoverinfo="skip",
         legendgroup="HUB_HORARIO",
         xaxis="x2"
