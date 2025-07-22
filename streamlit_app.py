@@ -367,7 +367,7 @@ fig.update_layout(
     legend=dict(
         orientation="h",
         yanchor="bottom",   # ancora a parte inferior da legenda
-        y=1.06,              # ligeiramente acima dos dias da semana
+        y=1,              # ligeiramente acima dos dias da semana
         xanchor="center",
         x=0.5,               # centralizado horizontalmente
         font=dict(size=13),
