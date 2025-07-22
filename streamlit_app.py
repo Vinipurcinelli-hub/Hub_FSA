@@ -208,7 +208,7 @@ anotacoes = []
 for i, x in enumerate(ticks_dias):
     anotacoes.append(dict(
         x=x + 12,
-        y=1.05,
+        y=1.01,
         xref="x2",
         yref="paper",
         text=f"<b>{dias_semana[i]}</b>",
