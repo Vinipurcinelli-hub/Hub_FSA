@@ -366,14 +366,15 @@ fig.update_layout(
     ),
     legend=dict(
         orientation="h",
-        yanchor="top",
-        y=0.98,  # agora a legenda vai para uma posição mais abaixo do topo
-        xanchor="left",
-        x=0,
+        yanchor="bottom",   # ancora a parte inferior da legenda
+        y=1.06,              # ligeiramente acima dos dias da semana
+        xanchor="center",
+        x=0.5,               # centralizado horizontalmente
         font=dict(size=13),
         traceorder="normal"
     ),
-    margin=dict(l=0, r=0, t=120, b=60),  # aumenta espaço superior real
+    margin=dict(l=0, r=0, t=120, b=60),  # mantém folga no topo
+
     height=500 + 30 * len(viagens_ordenadas),
     hoverlabel=dict(font_size=11)
 )
