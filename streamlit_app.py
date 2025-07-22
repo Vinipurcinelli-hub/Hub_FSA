@@ -49,6 +49,14 @@ df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 # Considera apenas os primeiros 10 dias (de quarta a sexta da semana seguinte)
 df = df[df["HORA_ABSOLUTA"] < 24 * 7].copy()
 
+# Cria cópias dos blocos que ultrapassam o limite de 7 dias (>= 168h)
+df_excedente = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > 168].copy()
+
+if not df_excedente.empty:
+    df_excedente["HORA_ABSOLUTA"] = df_excedente["HORA_ABSOLUTA"] - 168
+    df = pd.concat([df, df_excedente], ignore_index=True)
+
+
 # Todos os blocos são tratados de maneira única
 df["PARTE"] = 0
 
