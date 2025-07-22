@@ -49,12 +49,37 @@ df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 # Considera apenas os primeiros 10 dias (de quarta a sexta da semana seguinte)
 df = df[df["HORA_ABSOLUTA"] < 24 * 7].copy()
 
-# Cria cópias dos blocos que ultrapassam o limite de 7 dias (>= 168h)
-df_excedente = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > 168].copy()
+# Divide os blocos que ultrapassam o final da terça-feira (168h)
+LIMITE_SEMANA = 168
+df_corte = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > LIMITE_SEMANA].copy()
 
-if not df_excedente.empty:
-    df_excedente["HORA_ABSOLUTA"] = df_excedente["HORA_ABSOLUTA"] - 168
-    df = pd.concat([df, df_excedente], ignore_index=True)
+if not df_corte.empty:
+    blocos_quebrados = []
+
+    for _, row in df_corte.iterrows():
+        hora_ini = row["HORA_ABSOLUTA"]
+        dur = row["DURACAO_H"]
+        hora_fim = hora_ini + dur
+
+        # Parte que cabe até 168h
+        dur_primeira = LIMITE_SEMANA - hora_ini
+        if dur_primeira > 0:
+            parte1 = row.copy()
+            parte1["HORA_ABSOLUTA"] = hora_ini
+            parte1["DURACAO_H"] = dur_primeira
+            blocos_quebrados.append(parte1)
+
+        # Parte excedente — desenhar do início da semana (0h) em diante
+        dur_excedente = hora_fim - LIMITE_SEMANA
+        if dur_excedente > 0:
+            parte2 = row.copy()
+            parte2["HORA_ABSOLUTA"] = 0
+            parte2["DURACAO_H"] = dur_excedente
+            blocos_quebrados.append(parte2)
+
+    df = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] <= LIMITE_SEMANA].copy()
+    df = pd.concat([df, pd.DataFrame(blocos_quebrados)], ignore_index=True)
+
 
 
 # Todos os blocos são tratados de maneira única
