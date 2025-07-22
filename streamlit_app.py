@@ -46,32 +46,11 @@ def load_data(path: str):
 
 df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 
-# Expande viagens que ultrapassam a terça-feira, fazendo-as continuar na
-# quarta-feira seguinte na mesma linha do eixo Y.
-SEMANA_H = 24 * 7
-expanded_rows = []
-for _, row in df.iterrows():
-    inicio = row["HORA_ABSOLUTA"]
-    fim = inicio + row["DURACAO_H"]
-    if fim <= SEMANA_H:
-        row_dict = row.to_dict()
-        row_dict["PARTE"] = 0  # bloco unico
-        expanded_rows.append(row_dict)
-    else:
-        parte1 = row.copy()
-        parte1["DURACAO_H"] = SEMANA_H - inicio
-        parte1_dict = parte1.to_dict()
-        parte1_dict["PARTE"] = 1  # trecho final da semana (direita)
-        expanded_rows.append(parte1_dict)
+# Considera apenas os primeiros 10 dias (de quarta a sexta da semana seguinte)
+df = df[df["HORA_ABSOLUTA"] < 24 * 10].copy()
 
-        parte2 = row.copy()
-        parte2["HORA_ABSOLUTA"] = 0
-        parte2["DURACAO_H"] = fim - SEMANA_H
-        parte2_dict = parte2.to_dict()
-        parte2_dict["PARTE"] = 2  # continuação na quarta (esquerda)
-        expanded_rows.append(parte2_dict)
-
-df = pd.DataFrame(expanded_rows)
+# Todos os blocos são tratados de maneira única
+df["PARTE"] = 0
 df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
 
 # === GRÁFICO ===
@@ -168,7 +147,7 @@ fig.add_trace(
 )
 
 # === GRADE DE HORAS E DIAS ===
-x_ticks = list(range(0, 24 * 7 + 1))
+x_ticks = list(range(0, 24 * 10 + 1))
 dias_semana = [
     "QUA",
     "QUI",
@@ -177,8 +156,11 @@ dias_semana = [
     "DOM",
     "SEG",
     "TER",
+    "QUA",
+    "QUI",
+    "SEX",
 ]
-ticks_dias = [i * 24 for i in range(7)]
+ticks_dias = [i * 24 for i in range(10)]
 x_labels = [str(h % 24) if h % 24 != 0 else "" for h in x_ticks]
 
 # Delimitações entre os dias
@@ -195,8 +177,8 @@ for x in ticks_dias:
         layer="below",
     )
 
-# Fundo verde claro de 07:00 às 22:00 para cada um dos sete dias
-for dia in range(7):
+# Fundo verde claro de 07:00 às 22:00 para cada um dos dez dias
+for dia in range(10):
     fig.add_shape(
         type="rect",
         x0=dia * 24 + 7,
@@ -260,7 +242,7 @@ fig.update_layout(
         tickfont=dict(size=9),
         ticks="outside",
         title="Horário do Dia",
-        range=[0, 24 * 7],
+        range=[0, 24 * 10],
     ),
     yaxis=dict(
         title="VIAGEM",
