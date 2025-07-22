@@ -312,9 +312,9 @@ fig.add_trace(
 )
 
 LEGENDA_OBS = {
-    1: "1 - INTEGRADO -<br>FREQ. MÍNIMA",
-    2: "2 - INTEGRADO +<br>HUB GUANABARA",
-    3: "3 - INTERCONEXÕES +<br>HUB GUANABARA",
+    1: "1 - INTEGRADO - FREQ. MÍNIMA",
+    2: "2 - INTEGRADO + HUB GUANABARA",
+    3: "3 - INTERCONEXÕES + HUB GUANABARA",
     4: "4 - FREQ. MÍNIMA"
 }
 
@@ -360,7 +360,7 @@ fig.update_layout(
     yaxis=dict(
         title="VIAGEM",
         autorange="reversed",
-        tickfont=dict(size=11),
+        tickfont=dict(size=10),
         categoryorder="array",
         categoryarray=viagens_ordenadas
     ),
@@ -373,7 +373,7 @@ fig.update_layout(
         font=dict(size=11),
     ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=10, r=10, t=90, b=60),  # aumente top para acomodar a legenda
+    margin=dict(l=10, r=10, t=60, b=60),  # aumente top para acomodar a legenda
     hoverlabel=dict(font_size=11)
 )
 
