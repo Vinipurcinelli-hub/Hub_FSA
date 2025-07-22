@@ -76,10 +76,10 @@ for empresa, grupo in df.groupby("EMPRESA"):
             base=grupo["HORA_ABSOLUTA"],
             orientation="h",
             marker=dict(
-                color="rgba(0,0,0,0.35)",  # tom escuro translúcido — pode ajustar
+                color="rgba(0,0,0,0.4)",  # tom escuro translúcido — pode ajustar
                 line=dict(width=0)
             ),
-            width=0.45,  # levemente maior que os blocos reais
+            width=1,  # levemente maior que os blocos reais
             showlegend=False,
             hoverinfo="skip",
             xaxis="x2"
