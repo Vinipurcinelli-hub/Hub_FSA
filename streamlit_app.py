@@ -374,7 +374,7 @@ fig.update_layout(
     traceorder="normal"
     ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=0, r=0, t=30, b=60),
+    margin=dict(l=0, r=0, t=40, b=60),
     hoverlabel=dict(font_size=11)
 )
 
