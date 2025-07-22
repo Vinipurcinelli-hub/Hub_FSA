@@ -101,13 +101,59 @@ for empresa, grupo in df.groupby("EMPRESA"):
 textos_esquerda = []
 textos_direita = []
 
-for idx, row in df.iterrows():
-    if row["DURACAO_H"] >= LIMIAR_TEXTO:
-        textos_esquerda.append(row["ORIGEM"])
-        textos_direita.append(row["DESTINO"])
-    else:
-        textos_esquerda.append("")        # não mostra origem
-        textos_direita.append("SPO")      # mostra apenas "SPO"
+for viagem, grupo in df.groupby("VIAGEM"):
+    grupo = grupo.sort_values("HORA_ABSOLUTA")
+    indices = grupo.index.tolist()
+
+    origem_mostrada = False
+    destino_mostrado = False
+
+    for i, idx in enumerate(indices):
+        row = df.loc[idx]
+        dur = row["DURACAO_H"]
+
+        # Flags para saber se é início/fim
+        is_primeiro = (i == 0)
+        is_ultimo = (i == len(indices) - 1)
+
+        # Caso só exista um bloco na viagem (não quebrada)
+        if len(indices) == 1:
+            if dur >= LIMIAR_TEXTO:
+                textos_esquerda.append(row["ORIGEM"])
+                textos_direita.append(row["DESTINO"])
+            else:
+                textos_esquerda.append(row["ORIGEM"])
+                textos_direita.append("")  # Ou DESTINO se preferir outro comportamento
+            continue
+
+        # Casos de viagem quebrada (múltiplos blocos)
+        if dur >= LIMIAR_TEXTO:
+            # Se for o primeiro e origem ainda não mostrada
+            if is_primeiro and not origem_mostrada:
+                textos_esquerda.append(row["ORIGEM"])
+                origem_mostrada = True
+            else:
+                textos_esquerda.append("")
+
+            # Se for o último e destino ainda não mostrado
+            if is_ultimo and not destino_mostrado:
+                textos_direita.append(row["DESTINO"])
+                destino_mostrado = True
+            else:
+                textos_direita.append("")
+        else:
+            # Bloco curto: mostra só se for início ou fim
+            if is_primeiro and not origem_mostrada:
+                textos_esquerda.append(row["ORIGEM"])
+                textos_direita.append("")
+                origem_mostrada = True
+            elif is_ultimo and not destino_mostrado:
+                textos_esquerda.append("")
+                textos_direita.append(row["DESTINO"])
+                destino_mostrado = True
+            else:
+                textos_esquerda.append("")
+                textos_direita.append("")
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
