@@ -93,6 +93,56 @@ for empresa, grupo in df.groupby("EMPRESA"):
         )
     )
 
+# === SETAS DESTACANDO O HUB (FSA) ===
+setas_hub = [
+    dict(
+        x=24 + 14,  # horário absoluto (ex: QUI 14h)
+        y="3 - CAMPINA GRANDE (PB) - SÃO PAULO (SP)",  # nome exato da VIAGEM
+        xref="x2",
+        yref="y",
+        ax=0,
+        ay=-40,
+        text="",  # sem texto, só seta
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1,
+        arrowwidth=2,
+        arrowcolor="red"
+    ),
+    dict(
+        x=48 + 8,  # horário absoluto (ex: SEX 08h)
+        y="2 - GUARABIRA (PB) - SÃO PAULO (SP) & RIO DE JANEIRO (RJ) - VIA 101",
+        xref="x2",
+        yref="y",
+        ax=0,
+        ay=-40,
+        text="",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1,
+        arrowwidth=2,
+        arrowcolor="red"
+    ),
+    dict(
+        x=24 + 12,
+        y="4 - FORTALEZA (CE) - SÃO PAULO (SP)",
+        xref="x2",
+        yref="y",
+        ax=0,
+        ay=-40,
+        text="",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1,
+        arrowwidth=2,
+        arrowcolor="red"
+    ),
+]
+
+# Adiciona todas as setas ao gráfico
+fig.update_layout(annotations=fig.layout.annotations + tuple(setas_hub))
+
+
 # 2. Textos para dentro dos blocos — com exceção "SPO" para blocos curtos
 textos_esquerda = []
 textos_direita = []
@@ -213,7 +263,6 @@ for i, x in enumerate(ticks_dias):
         font=dict(size=14, color="white"),
         align="center"
     ))
-
 
 # Legenda para o período de operação do HUB
 fig.add_trace(
