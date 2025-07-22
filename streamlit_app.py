@@ -230,6 +230,29 @@ fig.add_trace(
     )
 )
 
+LEGENDA_OBS = {
+    1: "1 - INTEGRADO - FREQ. MÍNIMA",
+    2: "2 - INTEGRADO + HUB GUANABARA",
+    3: "3 - INTERCONEXÕES + HUB GUANABARA",
+    4: "4 - FREQ. MÍNIMA"
+}
+
+# Legenda visual para os códigos de OBS (1 a 4)
+for cod, texto in LEGENDA_OBS.items():
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="markers",
+            marker=dict(size=10, color="white", symbol="circle"),  # cor neutra
+            showlegend=True,
+            name=texto,
+            hoverinfo="skip",
+            legendgroup="OBS",
+            xaxis="x2"
+        )
+    )
+
 # Layout final
 fig.update_layout(
     annotations=anotacoes,
