@@ -51,6 +51,13 @@ df = df[df["HORA_ABSOLUTA"] < 24 * 10].copy()
 
 # Todos os blocos são tratados de maneira única
 df["PARTE"] = 0
+df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(r'(\)\s*-\s*")', r'\1<br>', regex=True)
+
+# Recalcula os ordenamentos com os nomes já formatados
+viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
+viagens_ordenadas = sorted(
+    viagem_dia.index, key=lambda v: ORDEM_DIAS.index(viagem_dia.loc[v])
+)
 df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
 
 # === GRÁFICO ===
