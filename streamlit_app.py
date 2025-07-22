@@ -61,16 +61,20 @@ for _, row in df.iterrows():
     if hora_ini < LIMITE_SEMANA and hora_fim <= LIMITE_SEMANA:
         # Bloco totalmente dentro da semana
         df_quebrado.append(row)
+        row["BLOCO_QUEBRADO"] = "completo"
+
 
     elif hora_ini < LIMITE_SEMANA and hora_fim > LIMITE_SEMANA:
         # Bloco que cruza terça — quebrar em dois
         parte1 = row.copy()
         parte1["DURACAO_H"] = LIMITE_SEMANA - hora_ini
+        parte1["BLOCO_QUEBRADO"] = "final"
         df_quebrado.append(parte1)
-
+        
         parte2 = row.copy()
-        parte2["HORA_ABSOLUTA"] = 0  # reinicia no começo da semana
+        parte2["HORA_ABSOLUTA"] = 0
         parte2["DURACAO_H"] = hora_fim - LIMITE_SEMANA
+        parte2["BLOCO_QUEBRADO"] = "inicio"
         df_quebrado.append(parte2)
 
     elif hora_ini >= LIMITE_SEMANA:
@@ -180,6 +184,7 @@ textos_direita = []
 for idx, row in df.iterrows():
     dur = row["DURACAO_H"]
     sentido = str(row.get("SENTIDO", "")).upper().strip()
+    tipo_quebra = row.get("BLOCO_QUEBRADO", "completo")
 
     if dur < LIMIAR_TEXTO:
         if sentido == "IDA":
@@ -192,8 +197,15 @@ for idx, row in df.iterrows():
             textos_esquerda.append("")
             textos_direita.append("")
     else:
-        textos_esquerda.append(row["ORIGEM"])
-        textos_direita.append(row["DESTINO"])
+        if tipo_quebra == "inicio":
+            textos_esquerda.append("")
+            textos_direita.append(row["DESTINO"])
+        elif tipo_quebra == "final":
+            textos_esquerda.append(row["ORIGEM"])
+            textos_direita.append("")
+        else:
+            textos_esquerda.append(row["ORIGEM"])
+            textos_direita.append(row["DESTINO"])
 
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
