@@ -54,16 +54,22 @@ for _, row in df.iterrows():
     inicio = row["HORA_ABSOLUTA"]
     fim = inicio + row["DURACAO_H"]
     if fim <= SEMANA_H:
-        expanded_rows.append(row.to_dict())
+        row_dict = row.to_dict()
+        row_dict["PARTE"] = 0  # bloco unico
+        expanded_rows.append(row_dict)
     else:
         parte1 = row.copy()
         parte1["DURACAO_H"] = SEMANA_H - inicio
-        expanded_rows.append(parte1.to_dict())
+        parte1_dict = parte1.to_dict()
+        parte1_dict["PARTE"] = 1  # trecho final da semana (direita)
+        expanded_rows.append(parte1_dict)
 
         parte2 = row.copy()
         parte2["HORA_ABSOLUTA"] = 0
         parte2["DURACAO_H"] = fim - SEMANA_H
-        expanded_rows.append(parte2.to_dict())
+        parte2_dict = parte2.to_dict()
+        parte2_dict["PARTE"] = 2  # continuação na quarta (esquerda)
+        expanded_rows.append(parte2_dict)
 
 df = pd.DataFrame(expanded_rows)
 df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
@@ -102,12 +108,26 @@ textos_esquerda = []
 textos_direita = []
 
 for idx, row in df.iterrows():
-    if row["DURACAO_H"] >= LIMIAR_TEXTO:
-        textos_esquerda.append(row["ORIGEM"])
-        textos_direita.append(row["DESTINO"])
+    parte = row.get("PARTE", 0)
+    if parte == 1:  # bloco à direita (TER) - mostra apenas origem
+        if row["DURACAO_H"] >= LIMIAR_TEXTO:
+            textos_esquerda.append(row["ORIGEM"])
+        else:
+            textos_esquerda.append("")
+        textos_direita.append("")
+    elif parte == 2:  # bloco à esquerda (QUA) - mostra apenas destino
+        textos_esquerda.append("")
+        if row["DURACAO_H"] >= LIMIAR_TEXTO:
+            textos_direita.append(row["DESTINO"])
+        else:
+            textos_direita.append("SPO")
     else:
-        textos_esquerda.append("")        # não mostra origem
-        textos_direita.append("SPO")      # mostra apenas "SPO"
+        if row["DURACAO_H"] >= LIMIAR_TEXTO:
+            textos_esquerda.append(row["ORIGEM"])
+            textos_direita.append(row["DESTINO"])
+        else:
+            textos_esquerda.append("")        # não mostra origem
+            textos_direita.append("SPO")      # mostra apenas "SPO"
 
 # ORIGEM (esquerda) – só aparece se for >= 8h
 fig.add_trace(
