@@ -238,7 +238,7 @@ LEGENDA_OBS = {
 }
 
 # Legenda visual para os códigos de OBS (1 a 4)
-for cod in sorted(LEGENDA_OBS.keys()):
+for cod in sorted(LEGENDA_OBS.keys(), reverse=True):
     texto = LEGENDA_OBS[cod]
     fig.add_trace(
         go.Scatter(
@@ -250,7 +250,6 @@ for cod in sorted(LEGENDA_OBS.keys()):
             name=texto,
             hoverinfo="skip",
             legendgroup="OBS",
-            legendrank=100 + cod,
             xaxis="x2"
         )
     )
