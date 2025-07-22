@@ -61,20 +61,24 @@ df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(' - "', '<br>"', regex=False
 
 
 # Agrupar por viagem para obter o dia da semana e o horário de partida
+# Converte a hora para valor decimal (ex: 13:30 → 13.5)
+df["HORA_VIAGEM_DECIMAL"] = df["HORA VIAGEM"].apply(
+    lambda x: x.hour + x.minute / 60 if pd.notnull(x) else None
+)
+
+# Agrupa por VIAGEM e extrai o dia e hora decimal
 viagem_info = df.groupby("VIAGEM").agg({
     dia_col: lambda x: x.iloc[0].upper(),
-    "HORA VIAGEM": lambda x: pd.to_datetime(x.iloc[0]).hour + pd.to_datetime(x.iloc[0]).minute / 60
+    "HORA_VIAGEM_DECIMAL": "first"
 })
 
-# Ordenar pela posição no ORDEM_DIAS e depois pelo horário
+# Ordena por dia e hora
 viagem_info["ORD_DIA"] = viagem_info[dia_col].apply(lambda d: ORDEM_DIAS.index(d))
-viagem_info["ORD_HORA"] = viagem_info["HORA VIAGEM"]
+viagem_info = viagem_info.sort_values(["ORD_DIA", "HORA_VIAGEM_DECIMAL"])
 
-# Combinar os dois critérios
-viagem_info = viagem_info.sort_values(["ORD_DIA", "ORD_HORA"])
-
-# Lista ordenada final
+# Gera a nova ordenação
 viagens_ordenadas = viagem_info.index.tolist()
+
 
 
 
