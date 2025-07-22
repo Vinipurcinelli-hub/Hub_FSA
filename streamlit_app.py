@@ -58,10 +58,22 @@ dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
 df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(' - "', '<br>"', regex=False)
 
 # Recalcula os ordenamentos com os nomes já formatados
-viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
-viagens_ordenadas = sorted(
-    viagem_dia.index, key=lambda v: ORDEM_DIAS.index(viagem_dia.loc[v])
-)
+# Agrupar por viagem para obter o dia da semana e o horário de partida
+viagem_info = df.groupby("VIAGEM").agg({
+    dia_col: lambda x: x.iloc[0].upper(),
+    "HORA VIAGEM": lambda x: pd.to_datetime(x.iloc[0]).hour + pd.to_datetime(x.iloc[0]).minute / 60
+})
+
+# Ordenar pela posição no ORDEM_DIAS e depois pelo horário
+viagem_info["ORD_DIA"] = viagem_info[dia_col].apply(lambda d: ORDEM_DIAS.index(d))
+viagem_info["ORD_HORA"] = viagem_info["HORA VIAGEM"]
+
+# Combinar os dois critérios
+viagem_info = viagem_info.sort_values(["ORD_DIA", "ORD_HORA"])
+
+# Lista ordenada final
+viagens_ordenadas = viagem_info.index.tolist()
+
 df["VIAGEM"] = pd.Categorical(df["VIAGEM"], categories=viagens_ordenadas, ordered=True)
 
 # === GRÁFICO ===
