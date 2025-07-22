@@ -47,36 +47,40 @@ def load_data(path: str):
 df, viagens_ordenadas = load_data("Planejamento operacional.xlsx")
 
 # Considera apenas os primeiros 10 dias (de quarta a sexta da semana seguinte)
-df = df[df["HORA_ABSOLUTA"] < 24 * 7].copy()
+
 
 # Divide os blocos que ultrapassam o final da terça-feira (168h)
-LIMITE_SEMANA = 168
-df_quebrados = []
+LIMITE_SEMANA = 168  # 7 dias * 24 horas
+df_quebrado = []
 
-# Verifica quais viagens ultrapassam o limite
-viagens_excedentes = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > LIMITE_SEMANA]["VIAGEM"].unique()
-
-# Divide somente os blocos que extrapolam
 for _, row in df.iterrows():
     hora_ini = row["HORA_ABSOLUTA"]
     dur = row["DURACAO_H"]
     hora_fim = hora_ini + dur
 
-    if hora_fim <= LIMITE_SEMANA:
-        df_quebrados.append(row)
-    else:
-        # Bloco vai até o limite
+    if hora_ini < LIMITE_SEMANA and hora_fim <= LIMITE_SEMANA:
+        # Bloco totalmente dentro da semana
+        df_quebrado.append(row)
+
+    elif hora_ini < LIMITE_SEMANA and hora_fim > LIMITE_SEMANA:
+        # Bloco que cruza terça — quebrar em dois
         parte1 = row.copy()
         parte1["DURACAO_H"] = LIMITE_SEMANA - hora_ini
-        df_quebrados.append(parte1)
+        df_quebrado.append(parte1)
 
-        # Bloco continua do início da semana
         parte2 = row.copy()
-        parte2["HORA_ABSOLUTA"] = 0
+        parte2["HORA_ABSOLUTA"] = 0  # reinicia no começo da semana
         parte2["DURACAO_H"] = hora_fim - LIMITE_SEMANA
-        df_quebrados.append(parte2)
+        df_quebrado.append(parte2)
 
-df = pd.DataFrame(df_quebrados)
+    elif hora_ini >= LIMITE_SEMANA:
+        # Bloco que começa após terça — realocar na esquerda
+        parte = row.copy()
+        parte["HORA_ABSOLUTA"] = hora_ini - LIMITE_SEMANA
+        df_quebrado.append(parte)
+
+df = pd.DataFrame(df_quebrado)
+
 
 
 
