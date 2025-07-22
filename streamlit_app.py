@@ -343,7 +343,7 @@ fig.update_layout(
     dragmode="pan",
     xaxis=dict(visible=False),
     xaxis2=dict(
-        domain=[0.0, 1.0],
+        domain=[0.0, 1.0],  # Usa toda a largura, já que removemos a legenda lateral
         anchor="y",
         tickmode="array",
         tickvals=x_ticks,
@@ -364,8 +364,16 @@ fig.update_layout(
         categoryorder="array",
         categoryarray=viagens_ordenadas
     ),
+    legend=dict(
+        orientation="h",     # horizontal
+        yanchor="bottom",
+        y=1.12,              # distância do topo do gráfico (ajuste conforme necessário)
+        xanchor="left",
+        x=0,
+        font=dict(size=11),
+    ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=10, r=0, t=90, b=60),
+    margin=dict(l=10, r=10, t=160, b=60),  # aumente top para acomodar a legenda
     hoverlabel=dict(font_size=11)
 )
 
