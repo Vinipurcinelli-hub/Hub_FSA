@@ -94,8 +94,15 @@ df["PARTE"] = 0
 
 # Define qual coluna de dia da semana usar
 dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
-# Insere quebra de linha após ' - "', sem considerar ')'
-df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(' - "', '<br>"', regex=False)
+import re
+
+def quebrar_viagem(texto):
+    texto = re.sub(r"\s&\s", "<br>& ", texto, count=1)   # quebra no primeiro "&"
+    texto = texto.replace(' - "', '<br>"')               # quebra antes da hora
+    return texto
+
+df["VIAGEM"] = df["VIAGEM"].astype(str).apply(quebrar_viagem)
+
 
 # Recalcula os ordenamentos com os nomes já formatados
 
