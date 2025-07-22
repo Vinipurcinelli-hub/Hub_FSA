@@ -306,7 +306,7 @@ fig.add_trace(
         showlegend=True,
         name="HUB - FSA<br>(07:00 às 22:00)",
         hoverinfo="skip",
-        legendgroup="HUB_HORARIO",
+        legendgroup="CATEGORIAS",
         xaxis="x2"
     )
 )
@@ -330,7 +330,7 @@ for cod in sorted(LEGENDA_OBS.keys(), reverse=True):
             showlegend=True,
             name=texto,
             hoverinfo="skip",
-            legendgroup="OBS",
+            legendgroup="CATEGORIAS",
             xaxis="x2"
         )
     )
@@ -373,7 +373,7 @@ fig.update_layout(
         font=dict(size=11),
     ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=10, r=10, t=160, b=60),  # aumente top para acomodar a legenda
+    margin=dict(l=10, r=10, t=90, b=60),  # aumente top para acomodar a legenda
     hoverlabel=dict(font_size=11)
 )
 
