@@ -284,7 +284,7 @@ fig.update_layout(
         categoryarray=viagens_ordenadas
     ),
     height=500 + 50 * len(viagens_ordenadas),
-    margin=dict(l=5, r=5, t=50, b=80),
+    margin=dict(l=0, r=0, t=15, b=100),
     hoverlabel=dict(font_size=11)
 )
 
