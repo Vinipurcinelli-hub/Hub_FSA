@@ -365,18 +365,19 @@ fig.update_layout(
         categoryarray=viagens_ordenadas
     ),
     legend=dict(
-    orientation="h",
-    yanchor="top",
-    y=1.08,
-    xanchor="left",
-    x=0,
-    font=dict(size=13),
-    traceorder="normal"
+        orientation="h",
+        yanchor="top",
+        y=0.98,  # agora a legenda vai para uma posição mais abaixo do topo
+        xanchor="left",
+        x=0,
+        font=dict(size=13),
+        traceorder="normal"
     ),
+    margin=dict(l=0, r=0, t=120, b=60),  # aumenta espaço superior real
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=0, r=0, t=80, b=60),
     hoverlabel=dict(font_size=11)
 )
+
 
 
 # Exibição
