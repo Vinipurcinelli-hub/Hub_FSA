@@ -161,21 +161,6 @@ for dia in range(9):
         layer="below"
     )
 
-# Apenas adiciona a legenda do horário do HUB, sem afetar o layout
-fig.add_trace(
-    go.Scatter(
-        x=[None],
-        y=[None],
-        mode="markers",
-        marker=dict(size=12, color="lightgreen", symbol="square", line=dict(color="black", width=1)),
-        name="Horário HUB FSA (07:00 às 22:00)",
-        hoverinfo="skip",
-        showlegend=True,
-        legendgroup="HUB_HORARIO"
-    )
-)
-
-
 # Anotações dos dias da semana
 anotacoes = []
 for i, x in enumerate(ticks_dias):
