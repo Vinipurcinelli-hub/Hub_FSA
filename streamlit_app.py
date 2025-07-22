@@ -261,7 +261,7 @@ for cod in sorted(LEGENDA_OBS.keys(), reverse=True):
 fig.update_layout(
     annotations=anotacoes,
     barmode="stack",
-    bargap=0.1,
+    bargap=1,
     dragmode="pan",
     xaxis=dict(visible=False),
     xaxis2=dict(
