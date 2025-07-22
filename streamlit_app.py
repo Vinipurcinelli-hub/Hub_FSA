@@ -5,6 +5,19 @@ from datetime import datetime
 
 # === CONFIGURAÇÃO STREAMLIT ===
 st.set_page_config(layout="wide")
+with st.container():
+    st.markdown(
+        """
+        <style>
+            .main .block-container {
+                padding-left: 0rem !important;
+                padding-right: 0rem !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 st.title("🕒 Timeline Operacional - HUB FSA - ITAPEMIRIM + GUANABARA")
 
 # === CONSTANTES ===
