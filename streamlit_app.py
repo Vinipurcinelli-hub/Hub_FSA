@@ -196,7 +196,7 @@ fig.add_trace(
         name="HUB",
         hoverinfo="skip",
         legendgroup="HUB_HORARIO",
-        xaxis="X2"
+        xaxis="x2"
     )
 )
 
