@@ -51,34 +51,33 @@ df = df[df["HORA_ABSOLUTA"] < 24 * 7].copy()
 
 # Divide os blocos que ultrapassam o final da terça-feira (168h)
 LIMITE_SEMANA = 168
-df_corte = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > LIMITE_SEMANA].copy()
+df_quebrados = []
 
-if not df_corte.empty:
-    blocos_quebrados = []
+# Verifica quais viagens ultrapassam o limite
+viagens_excedentes = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] > LIMITE_SEMANA]["VIAGEM"].unique()
 
-    for _, row in df_corte.iterrows():
-        hora_ini = row["HORA_ABSOLUTA"]
-        dur = row["DURACAO_H"]
-        hora_fim = hora_ini + dur
+# Divide somente os blocos que extrapolam
+for _, row in df.iterrows():
+    hora_ini = row["HORA_ABSOLUTA"]
+    dur = row["DURACAO_H"]
+    hora_fim = hora_ini + dur
 
-        # Parte que cabe até 168h
-        dur_primeira = LIMITE_SEMANA - hora_ini
-        if dur_primeira > 0:
-            parte1 = row.copy()
-            parte1["HORA_ABSOLUTA"] = hora_ini
-            parte1["DURACAO_H"] = dur_primeira
-            blocos_quebrados.append(parte1)
+    if hora_fim <= LIMITE_SEMANA:
+        df_quebrados.append(row)
+    else:
+        # Bloco vai até o limite
+        parte1 = row.copy()
+        parte1["DURACAO_H"] = LIMITE_SEMANA - hora_ini
+        df_quebrados.append(parte1)
 
-        # Parte excedente — desenhar do início da semana (0h) em diante
-        dur_excedente = hora_fim - LIMITE_SEMANA
-        if dur_excedente > 0:
-            parte2 = row.copy()
-            parte2["HORA_ABSOLUTA"] = 0
-            parte2["DURACAO_H"] = dur_excedente
-            blocos_quebrados.append(parte2)
+        # Bloco continua do início da semana
+        parte2 = row.copy()
+        parte2["HORA_ABSOLUTA"] = 0
+        parte2["DURACAO_H"] = hora_fim - LIMITE_SEMANA
+        df_quebrados.append(parte2)
 
-    df = df[df["HORA_ABSOLUTA"] + df["DURACAO_H"] <= LIMITE_SEMANA].copy()
-    df = pd.concat([df, pd.DataFrame(blocos_quebrados)], ignore_index=True)
+df = pd.DataFrame(df_quebrados)
+
 
 
 
