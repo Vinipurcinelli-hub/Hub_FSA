@@ -343,7 +343,7 @@ fig.update_layout(
     dragmode="pan",
     xaxis=dict(visible=False),
     xaxis2=dict(
-        domain=[0.0, 1.0],  # Usa toda a largura, já que removemos a legenda lateral
+        domain=[0.0, 1.0],
         anchor="y",
         tickmode="array",
         tickvals=x_ticks,
@@ -360,22 +360,24 @@ fig.update_layout(
     yaxis=dict(
         title="VIAGEM",
         autorange="reversed",
-        tickfont=dict(size=10),
+        tickfont=dict(size=11),
         categoryorder="array",
         categoryarray=viagens_ordenadas
     ),
     legend=dict(
-        orientation="h",     # horizontal
+        orientation="h",
         yanchor="bottom",
-        y=1.12,              # distância do topo do gráfico (ajuste conforme necessário)
+        y=1.12,
         xanchor="left",
         x=0,
-        font=dict(size=11),
+        font=dict(size=10),
+        traceorder="normal",  # força a sequência correta
     ),
     height=500 + 30 * len(viagens_ordenadas),
-    margin=dict(l=10, r=10, t=60, b=60),  # aumente top para acomodar a legenda
+    margin=dict(l=10, r=10, t=60, b=60),
     hoverlabel=dict(font_size=11)
 )
+
 
 # Exibição
 config = {
