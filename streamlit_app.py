@@ -184,20 +184,6 @@ for i, x in enumerate(ticks_dias):
         align="center"
     ))
 
-# Legenda para o período de operação do HUB
-fig.add_trace(
-    go.Scatter(
-        x=[None],
-        y=[None],
-        mode="markers",
-        marker=dict(size=10, color="rgba(144,238,144,0.2)", symbol="square"),
-        showlegend=True,
-        name="HUB",
-        hoverinfo="skip",
-        legendgroup="HUB_HORARIO"
-    )
-)
-
 # Layout final
 fig.update_layout(
     annotations=anotacoes,
