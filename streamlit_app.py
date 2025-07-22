@@ -84,7 +84,7 @@ for empresa, grupo in df.groupby("EMPRESA"):
             ),
             name=empresa,
             legendgroup=empresa,
-            width=0.28 if empresa != "HUB" else 0.4,
+            width=0.35 if empresa != "HUB" else 0.6,
             customdata=grupo[["ORIGEM", "DESTINO", "HORA PARTIDA", "HORA CHEGADA"]],
             hovertemplate=(
                 "<b>%{y}</b><br>" +
