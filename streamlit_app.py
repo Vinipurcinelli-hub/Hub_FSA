@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 st.title("🕒 Timeline Operacional - HUB FSA - ITAPEMIRIM + GUANABARA")
 
 # === CONSTANTES ===
-CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "white"}
+CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
 ORDEM_DIAS = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
 LIMIAR_TEXTO = 8  # horas
 
