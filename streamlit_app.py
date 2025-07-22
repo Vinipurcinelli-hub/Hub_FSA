@@ -55,7 +55,7 @@ df["PARTE"] = 0
 # Define qual coluna de dia da semana usar
 dia_col = "DIA SEMANA" if "DIA SEMANA" in df.columns else "DIA SEMANA PARTIDA"
 # Insere quebra de linha após ' - "', sem considerar ')'
-df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(' - "', ' - <br>"', regex=False)
+df["VIAGEM"] = df["VIAGEM"].astype(str).str.replace(' - "', '<br>"', regex=False)
 
 # Recalcula os ordenamentos com os nomes já formatados
 viagem_dia = df.groupby("VIAGEM")[dia_col].first().str.upper()
