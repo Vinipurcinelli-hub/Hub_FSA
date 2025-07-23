@@ -362,7 +362,7 @@ fig.update_layout(
         tickfont=dict(size=9),
         ticks="outside",
         title="Horário do Dia",
-        range=[3, 180],  # ou outro valor ajustado
+        range=[1, 300],  # ou outro valor ajustado
     ),
     yaxis=dict(
         title="VIAGEM",
