@@ -299,7 +299,7 @@ for i, x in enumerate(ticks_dias):
         yref="paper",
         text=f"<b>{dias_semana[i]}</b>",
         showarrow=False,
-        font=dict(size=14, color="white"),
+        font=dict(size=14, color="black"),
         align="center"
     ))
 
@@ -309,7 +309,7 @@ fig.add_trace(
         x=[None],
         y=[None],
         mode="markers",
-        marker=dict(size=10, color="rgba(144,238,144,0.2)", symbol="square"),
+        marker=dict(size=10, color="black", symbol="square"),
         showlegend=True,
         name="HUB - FSA<br>(07:00 às 22:00)",
         hoverinfo="skip",
