@@ -3,3 +3,6 @@ pandas
 pydeck
 openpyxl
 plotly
+fpdf
+pillow
+kaleido
