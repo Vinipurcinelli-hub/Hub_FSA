@@ -397,50 +397,51 @@ config = {
 st.plotly_chart(fig, use_container_width=True, config=config)
 
 import io
+import cairosvg
 from fpdf import FPDF
 from PIL import Image
 
-# === GERAR PDF PAGINADO COM DOWNLOAD ===
+# === GERAR PDF PAGINADO (usando SVG convertido) ===
 with st.spinner("Gerando PDF..."):
 
-    # 1. Exporta gráfico como imagem PNG de alta qualidade
-    img_bytes = fig.to_image(format="png", width=2400, height=fig.layout.height or 2000, scale=3)
-    img = Image.open(io.BytesIO(img_bytes))
+    # 1. Gera gráfico como SVG
+    svg_bytes = fig.to_image(format="svg")
 
-    # 2. Define tamanho da página A4 paisagem (em pixels)
+    # 2. Converte SVG para PNG (em memória)
+    png_bytes = cairosvg.svg2png(bytestring=svg_bytes)
+    img = Image.open(io.BytesIO(png_bytes))
+
+    # 3. Dimensões da página A4 paisagem
     DPI = 300
     A4_WIDTH_MM = 297
     A4_HEIGHT_MM = 210
     PAGE_WIDTH_PX = int(DPI * A4_WIDTH_MM / 25.4)
     PAGE_HEIGHT_PX = int(DPI * A4_HEIGHT_MM / 25.4)
 
-    # 3. Calcula número de páginas necessárias
     img_width, img_height = img.size
     num_pages = (img_height // PAGE_HEIGHT_PX) + 1
 
-    # 4. Cria PDF com múltiplas páginas
+    # 4. Gera PDF paginado
     pdf = FPDF(orientation="L", unit="mm", format="A4")
-
     for i in range(num_pages):
         top = i * PAGE_HEIGHT_PX
         bottom = min((i + 1) * PAGE_HEIGHT_PX, img_height)
-        crop = img.crop((0, top, img_width, bottom))
+        cropped = img.crop((0, top, img_width, bottom))
 
-        # Salva temporariamente (Streamlit não salva permanente)
         temp_crop_path = f"crop_page_{i}.png"
-        crop.save(temp_crop_path)
+        cropped.save(temp_crop_path)
 
         pdf.add_page()
         pdf.image(temp_crop_path, x=0, y=0, w=A4_WIDTH_MM)
 
-    # 5. Salva em memória para download
+    # 5. PDF em memória
     pdf_buffer = io.BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
 
-    # 6. Botão para baixar
+    # 6. Botão de download
     st.download_button(
-        label="📥 Baixar PDF paginado da timeline",
+        label="📥 Baixar PDF da timeline (paginado)",
         data=pdf_buffer,
         file_name="timeline_operacional_HUB_FSA.pdf",
         mime="application/pdf"
