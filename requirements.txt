@@ -5,4 +5,4 @@ openpyxl
 plotly
 fpdf
 pillow
-kaleido
+cairosvg
