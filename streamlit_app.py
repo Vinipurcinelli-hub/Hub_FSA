@@ -309,7 +309,7 @@ fig.add_trace(
         x=[None],
         y=[None],
         mode="markers",
-        marker=dict(size=10, color="black", symbol="square"),
+        marker=dict(size=10, color="rgba(144,238,144,0.2)", symbol="square"),
         showlegend=True,
         name="HUB - FSA<br>(07:00 às 22:00)",
         hoverinfo="skip",
@@ -333,7 +333,7 @@ for cod in sorted(LEGENDA_OBS.keys(), reverse=True):
             x=[None],
             y=[None],
             mode="markers",
-            marker=dict(size=10, color="white", symbol="circle"),  # cor neutra
+            marker=dict(size=10, color="black", symbol="circle"),  # cor neutra
             showlegend=True,
             name=texto,
             hoverinfo="skip",
