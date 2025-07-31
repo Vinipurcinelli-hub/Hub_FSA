@@ -333,7 +333,7 @@ for cod in sorted(LEGENDA_OBS.keys(), reverse=True):
             x=[None],
             y=[None],
             mode="markers",
-            marker=dict(size=10, color="white", symbol="circle"),  # cor neutra
+            marker=dict(size=10, color="black", symbol="circle"),  # cor neutra
             showlegend=True,
             name=texto,
             hoverinfo="skip",
