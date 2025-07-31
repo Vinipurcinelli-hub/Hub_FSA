@@ -10,7 +10,7 @@ st.title("🕒 Timeline Operacional - HUB FSA - ITAPEMIRIM + GUANABARA")
 # === CONSTANTES ===
 CORES = {"GUANABARA": "royalblue", "ITAPEMIRIM": "gold", "HUB": "firebrick"}
 ORDEM_DIAS = ["QUA", "QUI", "SEX", "SÁB", "DOM", "SEG", "TER"]
-LIMIAR_TEXTO = 8  # horas
+LIMIAR_TEXTO = 9  # horas
 
 @st.cache_data
 def load_data(path: str):
