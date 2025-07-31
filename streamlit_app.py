@@ -299,7 +299,7 @@ for i, x in enumerate(ticks_dias):
         yref="paper",
         text=f"<b>{dias_semana[i]}</b>",
         showarrow=False,
-        font=dict(size=14, color="white"),
+        font=dict(size=14, color="black"),
         align="center"
     ))
 
